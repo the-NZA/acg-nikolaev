@@ -14,7 +14,7 @@ buildnrace:
 	go run $(BUILD_FLAGS) -race ./cmd/$(APP)
 
 DBPORT = 27017
-DBDIR $(shell pwd)/mongodata
+DBDIR = $(shell pwd)/mongodata
 
 .PHONY: rundb
 rundb:

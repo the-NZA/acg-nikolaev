@@ -1,0 +1,105 @@
+package acg
+
+import (
+	"net/http"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-pkgz/lgr"
+)
+
+// Server contains all things to run website
+type Server struct {
+	config *Config
+	logger *lgr.Logger
+	router *chi.Mux
+	// store *store.Store
+}
+
+// newLogger configure logger in DEBUG or PRODUCTION mode
+// Possible log levels TRACE, DEBUG, INFO, WARN, ERROR, PANIC and FATAL
+func newLogger(dbg bool) *lgr.Logger {
+	if dbg {
+		return lgr.New(lgr.Msec, lgr.Debug, lgr.CallerFile, lgr.CallerFunc, lgr.LevelBraces)
+	}
+
+	return lgr.New(lgr.Msec, lgr.LevelBraces)
+}
+
+// NewServer returns Server object with router, logger and config
+func NewServer(config *Config) *Server {
+	return &Server{
+		config: config,
+		logger: newLogger(config.LogDebug),
+		router: chi.NewRouter(),
+	}
+}
+
+func (s *Server) configureRouter() {
+	// Pages Routes
+	s.router.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("home page"))
+	})
+
+	s.router.Get("/about", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("about page"))
+	})
+
+	s.router.Get("/materials", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("materials page"))
+	})
+
+	s.router.Get("/services", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("services page"))
+	})
+
+	s.router.Get("/contacts", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("contacts page"))
+	})
+
+	s.router.Route("/posts", func(r chi.Router) {
+		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("posts"))
+		})
+
+		r.Get("/{postSlug:[a-z-]+}", func(w http.ResponseWriter, r *http.Request) {
+			slug := chi.URLParam(r, "postSlug")
+
+			s.logger.Logf("INFO %v\n", slug)
+
+			w.Write([]byte(slug))
+
+		})
+	})
+
+	s.router.Route("/category", func(r chi.Router) {
+		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("category"))
+		})
+
+		r.Get("/{categorySlug:[a-z-]+}", func(w http.ResponseWriter, r *http.Request) {
+			slug := chi.URLParam(r, "categorySlug")
+
+			s.logger.Logf("INFO %v\n", slug)
+
+			w.Write([]byte(slug))
+		})
+	})
+	// Pages END
+
+	// API Routes
+	s.router.Route("/api", func(r chi.Router) {
+		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("This is api"))
+		})
+	})
+	// API END
+}
+
+// Start performs pre-run configuration and starts server
+func (s *Server) Start() error {
+	s.configureRouter()
+
+	s.logger.Logf("INFO Server is starting at %v...\n", s.config.BindAddr)
+
+	return http.ListenAndServe(s.config.BindAddr, s.router)
+}

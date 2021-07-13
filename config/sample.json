@@ -1,6 +1,6 @@
 {
 	"bind_addr": "YOUR-DOMAIN:YOUR-PORT",
 	"db_url": "mongodb://YOUR-DB-DOMAIN:YOUR-DB-PORT",
-	"log_level": "debug",
+	"log_debug": true,
 	"secret_key": "YOUR-SECRET-KEY"
 }
