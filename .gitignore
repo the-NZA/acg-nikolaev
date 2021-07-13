@@ -1,0 +1,8 @@
+/acg
+config/acg_*.json
+mongodata
+static
+.DS_Store
+Dockerfile
+etc
+uploads
