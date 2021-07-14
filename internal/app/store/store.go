@@ -47,7 +47,7 @@ func (s *Store) Open() error {
 	return nil
 }
 
-// Close just close the connection
+// Close just abort the connection
 func (s *Store) Close() {
 	s.db.Disconnect(dbctx)
 }
