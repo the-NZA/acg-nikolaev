@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-pkgz/lgr"
+	"github.com/the-NZA/acg-nikolaev/internal/app/store"
 )
 
 // Server contains all things to run website
@@ -12,7 +13,7 @@ type Server struct {
 	config *Config
 	logger *lgr.Logger
 	router *chi.Mux
-	// store *store.Store
+	store  *store.Store
 }
 
 // newLogger configure logger in DEBUG or PRODUCTION mode
@@ -95,9 +96,25 @@ func (s *Server) configureRouter() {
 	// API END
 }
 
+// configureStore creates new Store and try to establish connection
+func (s *Server) configureStore() error {
+	st := store.NewStore(s.config.DatabaseURL)
+
+	if err := st.Open(); err != nil {
+		return err
+	}
+
+	s.store = st
+	return nil
+}
+
 // Start performs pre-run configuration and starts server
 func (s *Server) Start() error {
 	s.configureRouter()
+
+	if err := s.configureStore(); err != nil {
+		return err
+	}
 
 	s.logger.Logf("INFO Server is starting at %v...\n", s.config.BindAddr)
 
