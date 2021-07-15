@@ -14,24 +14,13 @@ type Server struct {
 	config *Config
 	logger *lgr.Logger
 	router *chi.Mux
-	store  *store.Store
-}
-
-// newLogger configure logger in DEBUG or PRODUCTION mode
-// Possible log levels TRACE, DEBUG, INFO, WARN, ERROR, PANIC and FATAL
-func newLogger(dbg bool) *lgr.Logger {
-	if dbg {
-		return lgr.New(lgr.Msec, lgr.Debug, lgr.CallerFile, lgr.CallerFunc, lgr.LevelBraces)
-	}
-
-	return lgr.New(lgr.Msec, lgr.LevelBraces)
+	store  store.Storer
 }
 
 // NewServer returns Server object with router, logger and config
 func NewServer(config *Config) *Server {
 	return &Server{
 		config: config,
-		logger: newLogger(config.LogDebug),
 		router: chi.NewRouter(),
 	}
 }
@@ -108,8 +97,20 @@ func (s *Server) configureStore() error {
 	return nil
 }
 
+// newLogger configure logger in DEBUG or PRODUCTION mode
+// Possible log levels TRACE, DEBUG, INFO, WARN, ERROR, PANIC and FATAL
+func (s *Server) configureLogger(dbg bool) *lgr.Logger {
+	if dbg {
+		return lgr.New(lgr.Msec, lgr.Debug, lgr.CallerFile, lgr.CallerFunc, lgr.LevelBraces)
+	}
+
+	return lgr.New(lgr.Msec, lgr.LevelBraces)
+}
+
 // Start performs pre-run configuration and starts server
 func (s *Server) Start() error {
+	s.configureLogger(s.config.LogDebug)
+
 	s.configureRouter()
 
 	if err := s.configureStore(); err != nil {

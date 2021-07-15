@@ -14,8 +14,9 @@ const dbName = "acg_db"
 
 // Store represents abstraction for MongoDB
 type Store struct {
-	db             *mongo.Client
-	postRepository *PostRepository
+	db                 *mongo.Client
+	postRepository     *PostRepository
+	categoryRepository *CategoryRepository
 }
 
 // context for mongo db with 15 seconds timeout
@@ -57,4 +58,16 @@ func (s *Store) Posts() store.IPostRepository {
 	}
 
 	return s.postRepository
+}
+
+func (s *Store) Categories() store.ICategoryRepository {
+	if s.categoryRepository != nil {
+		return s.categoryRepository
+	}
+
+	s.categoryRepository = &CategoryRepository{
+		store: s,
+	}
+
+	return s.categoryRepository
 }

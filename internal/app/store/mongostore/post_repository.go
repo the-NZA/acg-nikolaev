@@ -1,6 +1,9 @@
 package mongostore
 
-import "github.com/the-NZA/acg-nikolaev/internal/app/models"
+import (
+	"github.com/the-NZA/acg-nikolaev/internal/app/models"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 // PostRepository implements IPostRepository
 type PostRepository struct {
@@ -18,6 +21,6 @@ func (p PostRepository) Find(slug string) (*models.Post, error) {
 }
 
 // Delete marks post as deleted
-func (p PostRepository) Delete(*models.Post) error {
+func (p PostRepository) Delete(deletedID primitive.ObjectID) error {
 	return nil
 }
