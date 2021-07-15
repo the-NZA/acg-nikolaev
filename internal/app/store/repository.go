@@ -5,13 +5,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// IUserRepository defines interface for user repository
-type IUserRepository interface {
-	Create() error
-	Find() error
-	Delete() error
-}
-
 // IPostRepository defines interface for post repository
 type IPostRepository interface {
 	Create(*models.Post) error
@@ -23,5 +16,26 @@ type IPostRepository interface {
 type ICategoryRepository interface {
 	Create(*models.Category) error
 	Find(string) (*models.Category, error)
+	Delete(primitive.ObjectID) error
+}
+
+// IMaterialRepository defines interface for material repository
+type IMaterialRepository interface {
+	Create(*models.Material) error
+	Find(string) (*models.Material, error)
+	Delete(primitive.ObjectID) error
+}
+
+// IMatCategoryRepository defines interface for material category repository
+type IMatCategoryRepository interface {
+	Create(*models.MatCategory) error
+	Find(string) (*models.MatCategory, error)
+	Delete(primitive.ObjectID) error
+}
+
+// IUserRepository defines interface for user repository
+type IUserRepository interface {
+	Create(*models.User) error
+	Find(string) (*models.User, error)
 	Delete(primitive.ObjectID) error
 }

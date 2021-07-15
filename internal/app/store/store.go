@@ -4,6 +4,8 @@ package store
 type Storer interface {
 	Posts() IPostRepository
 	Categories() ICategoryRepository
+	Materials() IMaterialRepository
+	MatCategoies() IMatCategoryRepository
+	Users() IUserRepository
 	// Pages()
-	// Users()
 }
