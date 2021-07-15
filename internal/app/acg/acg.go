@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-pkgz/lgr"
 	"github.com/the-NZA/acg-nikolaev/internal/app/store"
+	"github.com/the-NZA/acg-nikolaev/internal/app/store/mongostore"
 )
 
 // Server contains all things to run website
@@ -98,9 +99,8 @@ func (s *Server) configureRouter() {
 
 // configureStore creates new Store and try to establish connection
 func (s *Server) configureStore() error {
-	st := store.NewStore(s.config.DatabaseURL)
-
-	if err := st.Open(); err != nil {
+	st, err := mongostore.NewStore(s.config.DatabaseURL)
+	if err != nil {
 		return err
 	}
 
