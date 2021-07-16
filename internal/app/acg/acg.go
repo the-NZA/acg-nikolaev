@@ -84,6 +84,7 @@ func (s *Server) configureRouter() {
 		})
 
 		r.Route("/category", func(r chi.Router) {
+			r.Get("/", s.handleCategoryGetBySlug())
 			r.Post("/", s.handleCategoryCreate())
 		})
 	})

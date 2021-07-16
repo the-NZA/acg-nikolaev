@@ -2,10 +2,11 @@ package mongostore
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"time"
 
 	"github.com/the-NZA/acg-nikolaev/internal/app/models"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -20,10 +21,18 @@ func (c *CategoryRepository) Create(cat *models.Category) error {
 	var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
+	if err := cat.Validate(); err != nil {
+		return err
+	}
+
+	fcat, _ := c.FindBySlug(cat.Slug)
+	if fcat != nil {
+		return errors.New("Category already with exist")
+	}
+
 	db := c.store.db.Database(dbName)
 	col := db.Collection(c.collectionName)
 
-	// _, err := col.InsertOne(ctx, cat)
 	if _, err := col.InsertOne(ctx, cat); err != nil {
 		return err
 	}
@@ -31,11 +40,42 @@ func (c *CategoryRepository) Create(cat *models.Category) error {
 	return nil
 }
 
-// Find category by it slug
-func (c *CategoryRepository) Find(slug string) (*models.Category, error) {
-	fmt.Println("repository find")
+// Find category by it ID
+func (c *CategoryRepository) Find(ID primitive.ObjectID) (*models.Category, error) {
+	var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
-	return nil, nil
+	db := c.store.db.Database(dbName)
+	col := db.Collection(c.collectionName)
+	res := col.FindOne(ctx, bson.M{"_id": ID})
+
+	cat := &models.Category{}
+
+	err := res.Decode(cat)
+	if err != nil {
+		return nil, err
+	}
+
+	return cat, nil
+}
+
+// Find category by it slug
+func (c *CategoryRepository) FindBySlug(slug string) (*models.Category, error) {
+	var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	db := c.store.db.Database(dbName)
+	col := db.Collection(c.collectionName)
+	res := col.FindOne(ctx, bson.M{"slug": slug})
+
+	cat := &models.Category{}
+
+	err := res.Decode(cat)
+	if err != nil {
+		return nil, err
+	}
+
+	return cat, nil
 }
 
 // Delete just marks category as deleted

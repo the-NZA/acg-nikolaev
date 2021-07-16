@@ -15,7 +15,8 @@ type IPostRepository interface {
 // ICategoryRepository defines interface for category repository
 type ICategoryRepository interface {
 	Create(*models.Category) error
-	Find(string) (*models.Category, error)
+	Find(primitive.ObjectID) (*models.Category, error)
+	FindBySlug(string) (*models.Category, error)
 	Delete(primitive.ObjectID) error
 }
 

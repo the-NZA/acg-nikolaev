@@ -42,24 +42,53 @@ func (s *Server) handleCategoryCreate() http.HandlerFunc {
 		var err error
 
 		if err = json.NewDecoder(r.Body).Decode(cat); err != nil {
-			s.logger.Logf("ERROR %v\n", err)
+			s.logger.Logf("[ERROR] %v\n", err)
 			s.error(w, r, http.StatusInternalServerError, err)
 			return
 		}
 
-		cat.URL = "/category/" + helpers.GenerateSlug(cat.Title)
+		cat.Slug = helpers.GenerateSlug(cat.Title)
 
-		s.logger.Logf("DEBUG before\n")
+		s.logger.Logf("[DEBUG] before\n")
 
 		if err = s.store.Categories().Create(cat); err != nil {
-			s.logger.Logf("ERROR %v\n", err)
+			s.logger.Logf("[ERROR] %v\n", err)
 			s.error(w, r, http.StatusInternalServerError, err)
 			return
 		}
 
-		s.logger.Logf("DEBUG After create\n")
+		s.logger.Logf("[DEBUG] After create\n")
 
 		s.respond(w, r, http.StatusOK, fmt.Sprintf("Category (%s) successfully created", cat.ID))
+
+	}
+}
+
+func (s *Server) handleCategoryGetBySlug() http.HandlerFunc {
+	type req struct {
+		Slug string `json:"slug"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		var (
+			err error
+			req *req
+		)
+
+		if err = json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		cat, err := s.store.Categories().FindBySlug(req.Slug)
+		if err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, cat)
 
 	}
 }
