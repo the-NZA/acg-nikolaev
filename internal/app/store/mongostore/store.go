@@ -69,7 +69,8 @@ func (s *Store) Categories() store.ICategoryRepository {
 	}
 
 	s.categoryRepository = &CategoryRepository{
-		store: s,
+		store:          s,
+		collectionName: "categories",
 	}
 
 	return s.categoryRepository

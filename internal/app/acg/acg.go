@@ -82,6 +82,10 @@ func (s *Server) configureRouter() {
 		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("This is api"))
 		})
+
+		r.Route("/category", func(r chi.Router) {
+			r.Post("/", s.handleCategoryCreate())
+		})
 	})
 	// API END
 }
@@ -109,7 +113,7 @@ func (s *Server) configureLogger(dbg bool) *lgr.Logger {
 
 // Start performs pre-run configuration and starts server
 func (s *Server) Start() error {
-	s.configureLogger(s.config.LogDebug)
+	s.logger = s.configureLogger(s.config.LogDebug)
 
 	s.configureRouter()
 
