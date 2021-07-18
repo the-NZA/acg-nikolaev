@@ -2,6 +2,7 @@ package store
 
 import (
 	"github.com/the-NZA/acg-nikolaev/internal/app/models"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -15,8 +16,9 @@ type IPostRepository interface {
 // ICategoryRepository defines interface for category repository
 type ICategoryRepository interface {
 	Create(*models.Category) error
-	Find(primitive.ObjectID) (*models.Category, error)
+	FindByID(primitive.ObjectID) (*models.Category, error)
 	FindBySlug(string) (*models.Category, error)
+	FindAll(bson.M) ([]*models.Category, error)
 	Delete(primitive.ObjectID) error
 }
 

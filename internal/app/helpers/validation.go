@@ -6,21 +6,17 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-var errInvalidObjectID = errors.New("ObjectID must be valid")
+var ErrInvalidObjectID = errors.New("ObjectID must be valid")
 
 func CheckObjectID(value interface{}) error {
 	switch value.(type) {
 	case primitive.ObjectID:
 		if !primitive.IsValidObjectID(value.(primitive.ObjectID).Hex()) {
-			return errInvalidObjectID
+			return ErrInvalidObjectID
 		}
 	default:
-		return errInvalidObjectID
+		return ErrInvalidObjectID
 	}
-
-	// if !primitive.IsValidObjectID(value.(string)) {
-	// 	return errInvalidObjectID
-	// }
 
 	return nil
 }

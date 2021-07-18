@@ -41,7 +41,7 @@ func (c *CategoryRepository) Create(cat *models.Category) error {
 }
 
 // Find category by it ID
-func (c *CategoryRepository) Find(ID primitive.ObjectID) (*models.Category, error) {
+func (c *CategoryRepository) FindByID(ID primitive.ObjectID) (*models.Category, error) {
 	var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -59,7 +59,30 @@ func (c *CategoryRepository) Find(ID primitive.ObjectID) (*models.Category, erro
 	return cat, nil
 }
 
-// Find category by it slug
+// FindAll return all categories
+func (c *CategoryRepository) FindAll(filter bson.M) ([]*models.Category, error) {
+	var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	db := c.store.db.Database(dbName)
+	col := db.Collection(c.collectionName)
+
+	res, err := col.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	cats := make([]*models.Category, 0)
+
+	err = res.All(ctx, &cats)
+	if err != nil {
+		return nil, err
+	}
+
+	return cats, nil
+}
+
+// FindBySlug finds category by it slug
 func (c *CategoryRepository) FindBySlug(slug string) (*models.Category, error) {
 	var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -80,5 +103,16 @@ func (c *CategoryRepository) FindBySlug(slug string) (*models.Category, error) {
 
 // Delete just marks category as deleted
 func (c *CategoryRepository) Delete(deletedID primitive.ObjectID) error {
+	var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	db := c.store.db.Database(dbName)
+	col := db.Collection(c.collectionName)
+
+	_, err := col.UpdateByID(ctx, deletedID, bson.M{"$set": bson.M{"deleted": true}})
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

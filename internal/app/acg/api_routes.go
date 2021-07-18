@@ -7,7 +7,9 @@ import (
 
 	"github.com/the-NZA/acg-nikolaev/internal/app/helpers"
 	"github.com/the-NZA/acg-nikolaev/internal/app/models"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 /*
@@ -49,17 +51,13 @@ func (s *Server) handleCategoryCreate() http.HandlerFunc {
 
 		cat.Slug = helpers.GenerateSlug(cat.Title)
 
-		s.logger.Logf("[DEBUG] before\n")
-
 		if err = s.store.Categories().Create(cat); err != nil {
 			s.logger.Logf("[ERROR] %v\n", err)
 			s.error(w, r, http.StatusInternalServerError, err)
 			return
 		}
 
-		s.logger.Logf("[DEBUG] After create\n")
-
-		s.respond(w, r, http.StatusOK, fmt.Sprintf("Category (%s) successfully created", cat.ID))
+		s.respond(w, r, http.StatusCreated, fmt.Sprintf("Category (%s) successfully created", cat.ID.Hex()))
 
 	}
 }
@@ -70,10 +68,52 @@ func (s *Server) handleCategoryGetBySlug() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		var (
-			err error
-			req *req
-		)
+		slug := r.URL.Query().Get("slug")
+
+		if slug == "" {
+			s.logger.Logf("[ERROR] %v\n", ErrNoRequestParams)
+			s.error(w, r, http.StatusBadRequest, ErrNoRequestParams)
+			return
+		}
+
+		cat, err := s.store.Categories().FindBySlug(slug)
+
+		switch err {
+		case mongo.ErrNoDocuments:
+			s.logger.Logf("[ERROR] %v\n", ErrNoCategory)
+			s.error(w, r, http.StatusNotFound, ErrNoCategory)
+			return
+		case nil:
+			s.respond(w, r, http.StatusOK, cat)
+			return
+		default:
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+	}
+}
+
+func (s *Server) handleCategoryGetAll() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		cats, err := s.store.Categories().FindAll(bson.M{"deleted": false})
+		if err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, cats)
+	}
+}
+
+func (s *Server) handleCategoryDelete() http.HandlerFunc {
+	type req struct {
+		ID primitive.ObjectID `json:"deletedID"`
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := &req{}
+		var err error
 
 		if err = json.NewDecoder(r.Body).Decode(req); err != nil {
 			s.logger.Logf("[ERROR] %v\n", err)
@@ -81,14 +121,12 @@ func (s *Server) handleCategoryGetBySlug() http.HandlerFunc {
 			return
 		}
 
-		cat, err := s.store.Categories().FindBySlug(req.Slug)
-		if err != nil {
+		if err = s.store.Categories().Delete(req.ID); err != nil {
 			s.logger.Logf("[ERROR] %v\n", err)
 			s.error(w, r, http.StatusInternalServerError, err)
 			return
 		}
 
-		s.respond(w, r, http.StatusOK, cat)
-
+		s.respond(w, r, http.StatusCreated, fmt.Sprintf("Category (%s) successfully deleted", req.ID.Hex()))
 	}
 }

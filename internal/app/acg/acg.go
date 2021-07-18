@@ -85,7 +85,9 @@ func (s *Server) configureRouter() {
 
 		r.Route("/category", func(r chi.Router) {
 			r.Get("/", s.handleCategoryGetBySlug())
+			r.Get("/all", s.handleCategoryGetAll())
 			r.Post("/", s.handleCategoryCreate())
+			r.Delete("/", s.handleCategoryDelete())
 		})
 	})
 	// API END
