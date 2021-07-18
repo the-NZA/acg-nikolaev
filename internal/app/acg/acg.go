@@ -89,6 +89,10 @@ func (s *Server) configureRouter() {
 			r.Post("/", s.handleCategoryCreate())
 			r.Delete("/", s.handleCategoryDelete())
 		})
+
+		r.Route("/post", func(r chi.Router) {
+			r.Post("/", s.handlePostCreate())
+		})
 	})
 	// API END
 }

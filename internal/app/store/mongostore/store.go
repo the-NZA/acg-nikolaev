@@ -57,7 +57,8 @@ func (s *Store) Posts() store.IPostRepository {
 	}
 
 	s.postRepository = &PostRepository{
-		store: s,
+		store:          s,
+		collectionName: "posts",
 	}
 
 	return s.postRepository

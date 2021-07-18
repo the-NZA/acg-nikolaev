@@ -9,7 +9,9 @@ import (
 // IPostRepository defines interface for post repository
 type IPostRepository interface {
 	Create(*models.Post) error
-	Find(string) (*models.Post, error)
+	FindBySlug(string) (*models.Post, error)
+	FindByURL(string) (*models.Post, error)
+	FindAll(bson.M) ([]*models.Post, error)
 	Delete(primitive.ObjectID) error
 }
 

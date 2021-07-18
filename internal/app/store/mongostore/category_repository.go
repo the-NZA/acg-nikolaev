@@ -47,7 +47,7 @@ func (c *CategoryRepository) FindByID(ID primitive.ObjectID) (*models.Category, 
 
 	db := c.store.db.Database(dbName)
 	col := db.Collection(c.collectionName)
-	res := col.FindOne(ctx, bson.M{"_id": ID})
+	res := col.FindOne(ctx, bson.M{"_id": ID, "deleted": false})
 
 	cat := &models.Category{}
 
