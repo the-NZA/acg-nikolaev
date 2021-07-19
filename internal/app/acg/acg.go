@@ -96,6 +96,11 @@ func (s *Server) configureRouter() {
 			r.Delete("/", s.handlePostDelete())
 			r.Get("/all", s.handlePostGetAll())
 		})
+
+		r.Route("/service", func(r chi.Router) {
+			// r.Get("/", s.handleServiceGetBySlug())
+			r.Post("/", s.handleServiceCreate())
+		})
 	})
 	// API END
 }

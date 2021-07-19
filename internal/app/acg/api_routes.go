@@ -245,3 +245,36 @@ func (s *Server) handlePostGetAll() http.HandlerFunc {
 /*
  * Post handlers END
  */
+
+/*
+ * Service handlers
+ */
+func (s *Server) handleServiceCreate() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		service := &models.Service{
+			ID: primitive.NewObjectID(),
+		}
+
+		var err error
+
+		if err = json.NewDecoder(r.Body).Decode(service); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		service.Slug = helpers.GenerateSlug(service.Title)
+
+		if err = s.store.Services().Create(service); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusCreated, fmt.Sprintf("Service (%s) successfully created", service.ID.Hex()))
+	}
+}
+
+/*
+ * Service handlers END
+ */

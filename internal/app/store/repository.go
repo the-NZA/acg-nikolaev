@@ -44,3 +44,11 @@ type IUserRepository interface {
 	Find(string) (*models.User, error)
 	Delete(primitive.ObjectID) error
 }
+
+// IServiceRepository defines interface for service repository
+type IServiceRepository interface {
+	Create(*models.Service) error
+	FindBySlug(string) (*models.Service, error)
+	Delete(primitive.ObjectID) error
+	FindAll(filter bson.M) ([]*models.Service, error)
+}

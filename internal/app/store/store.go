@@ -7,5 +7,6 @@ type Storer interface {
 	Materials() IMaterialRepository
 	MatCategoies() IMatCategoryRepository
 	Users() IUserRepository
+	Services() IServiceRepository
 	// Pages()
 }

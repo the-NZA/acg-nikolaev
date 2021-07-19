@@ -20,6 +20,7 @@ type Store struct {
 	materialsRepository *MaterialRepository
 	matCatRepository    *MatCatRepository
 	userRepository      *UserRepository
+	serviceRepository   *ServiceRepository
 }
 
 // context for mongo db with 15 seconds timeout
@@ -50,7 +51,9 @@ func (s *Store) Close() {
 	s.db.Disconnect(dbctx)
 }
 
-// Implement Storer interface
+/*
+ * Implement Storer interface
+ */
 func (s *Store) Posts() store.IPostRepository {
 	if s.postRepository != nil {
 		return s.postRepository
@@ -111,4 +114,17 @@ func (s *Store) Users() store.IUserRepository {
 	}
 
 	return s.userRepository
+}
+
+func (s *Store) Services() store.IServiceRepository {
+	if s.serviceRepository != nil {
+		return s.serviceRepository
+	}
+
+	s.serviceRepository = &ServiceRepository{
+		store:          s,
+		collectionName: "services",
+	}
+
+	return s.serviceRepository
 }

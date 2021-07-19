@@ -62,41 +62,11 @@ func (c *CategoryRepository) findOne(filter bson.M, opts ...*options.FindOneOpti
 // Find category by it ID
 func (c *CategoryRepository) FindByID(ID primitive.ObjectID) (*models.Category, error) {
 	return c.findOne(bson.M{"_id": ID, "deleted": false})
-	// var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
-	// defer cancel()
-
-	// db := c.store.db.Database(dbName)
-	// col := db.Collection(c.collectionName)
-	// res := col.FindOne(ctx, bson.M{"_id": ID, "deleted": false})
-
-	// cat := &models.Category{}
-
-	// err := res.Decode(cat)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// return cat, nil
 }
 
 // FindBySlug finds category by it slug
 func (c *CategoryRepository) FindBySlug(slug string) (*models.Category, error) {
 	return c.findOne(bson.M{"slug": slug, "deleted": false})
-	// var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
-	// defer cancel()
-
-	// db := c.store.db.Database(dbName)
-	// col := db.Collection(c.collectionName)
-	// res := col.FindOne(ctx, bson.M{"slug": slug})
-
-	// cat := &models.Category{}
-
-	// err := res.Decode(cat)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// return cat, nil
 }
 
 // FindAll return all categories
