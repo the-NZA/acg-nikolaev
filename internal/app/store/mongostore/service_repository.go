@@ -66,6 +66,11 @@ func (s ServiceRepository) FindBySlug(slug string) (*models.Service, error) {
 	return s.findOne(bson.M{"slug": slug, "deleted": false})
 }
 
+// FindByID lookup service by it id
+func (s ServiceRepository) FindByID(ID primitive.ObjectID) (*models.Service, error) {
+	return s.findOne(bson.M{"_id": ID, "deleted": false})
+}
+
 // FindAll return all services with specified filter
 func (s ServiceRepository) FindAll(filter bson.M) ([]*models.Service, error) {
 	var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)

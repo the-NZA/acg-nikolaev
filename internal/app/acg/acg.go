@@ -98,7 +98,7 @@ func (s *Server) configureRouter() {
 		})
 
 		r.Route("/service", func(r chi.Router) {
-			// r.Get("/", s.handleServiceGetBySlug())
+			r.Get("/", s.handleServiceGetByID())
 			r.Post("/", s.handleServiceCreate())
 		})
 	})
