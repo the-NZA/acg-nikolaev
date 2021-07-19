@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/the-NZA/acg-nikolaev/internal/app/helpers"
 	"github.com/the-NZA/acg-nikolaev/internal/app/models"
@@ -62,16 +63,12 @@ func (s *Server) handleCategoryCreate() http.HandlerFunc {
 }
 
 func (s *Server) handleCategoryGetBySlug() http.HandlerFunc {
-	type req struct {
-		Slug string `json:"slug"`
-	}
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		slug := r.URL.Query().Get("slug")
 
 		if slug == "" {
-			s.logger.Logf("[ERROR] %v\n", ErrNoRequestParams)
-			s.error(w, r, http.StatusBadRequest, ErrNoRequestParams)
+			s.logger.Logf("[ERROR] %v\n", helpers.ErrNoRequestParams)
+			s.error(w, r, http.StatusBadRequest, helpers.ErrNoRequestParams)
 			return
 		}
 
@@ -79,8 +76,8 @@ func (s *Server) handleCategoryGetBySlug() http.HandlerFunc {
 
 		switch err {
 		case mongo.ErrNoDocuments:
-			s.logger.Logf("[ERROR] %v\n", ErrNoCategory)
-			s.error(w, r, http.StatusNotFound, ErrNoCategory)
+			s.logger.Logf("[ERROR] %v\n", helpers.ErrNoCategory)
+			s.error(w, r, http.StatusNotFound, helpers.ErrNoCategory)
 			return
 		case nil:
 			s.respond(w, r, http.StatusOK, cat)
@@ -140,7 +137,8 @@ func (s *Server) handleCategoryDelete() http.HandlerFunc {
 func (s *Server) handlePostCreate() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		post := &models.Post{
-			ID: primitive.NewObjectID(),
+			ID:   primitive.NewObjectID(),
+			Time: time.Now(),
 		}
 
 		var err error
@@ -152,12 +150,11 @@ func (s *Server) handlePostCreate() http.HandlerFunc {
 		}
 
 		cat, err := s.store.Categories().FindByID(post.CategoryID)
-		s.logger.Logf("[DEBUG] %v\n", err)
 		if err != nil {
 			switch err {
 			case mongo.ErrNoDocuments:
-				s.logger.Logf("[ERROR] %v\n", ErrNoCategory)
-				s.error(w, r, http.StatusNotFound, ErrNoCategory)
+				s.logger.Logf("[ERROR] %v\n", helpers.ErrNoCategory)
+				s.error(w, r, http.StatusNotFound, helpers.ErrNoCategory)
 			default:
 				s.logger.Logf("[ERROR] %v\n", err)
 				s.error(w, r, http.StatusInternalServerError, err)
@@ -165,7 +162,8 @@ func (s *Server) handlePostCreate() http.HandlerFunc {
 			return
 		}
 
-		post.URL = cat.URL() + "/" + helpers.GenerateSlug(post.Title)
+		post.Slug = helpers.GenerateSlug(post.Title)
+		post.URL = cat.URL() + "/" + post.Slug
 
 		// post.URL = fmt.Sprintf("/%s/%s", cat.Slug, helpers.GenerateSlug(post.Title))
 
@@ -176,6 +174,47 @@ func (s *Server) handlePostCreate() http.HandlerFunc {
 		}
 
 		s.respond(w, r, http.StatusCreated, fmt.Sprintf("Post (%s) successfully created", post.ID.Hex()))
+	}
+}
+
+func (s *Server) handlePostGetBySlug() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		slug := r.URL.Query().Get("slug")
+
+		if slug == "" {
+			s.logger.Logf("[ERROR] %v\n", helpers.ErrNoRequestParams)
+			s.error(w, r, http.StatusBadRequest, helpers.ErrNoRequestParams)
+			return
+		}
+
+		post, err := s.store.Posts().FindBySlug(slug)
+
+		switch err {
+		case mongo.ErrNoDocuments:
+			s.logger.Logf("[ERROR] %v\n", helpers.ErrNoPost)
+			s.error(w, r, http.StatusNotFound, helpers.ErrNoPost)
+			return
+		case nil:
+			s.respond(w, r, http.StatusOK, post)
+			return
+		default:
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+	}
+}
+
+func (s *Server) handlePostGetAll() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		posts, err := s.store.Posts().FindAll(bson.M{"deleted": false})
+		if err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, posts)
 	}
 }
 

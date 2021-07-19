@@ -24,9 +24,9 @@ func (c Category) URL() string {
 func (c Category) Validate() error {
 	return validation.ValidateStruct(&c,
 		validation.Field(&c.ID, validation.Required, validation.By(helpers.CheckObjectID)),
-		validation.Field(&c.Title, validation.Required, validation.Length(5, 35)),
-		validation.Field(&c.Subtitle, validation.Required, validation.Length(25, 255)),
-		validation.Field(&c.MetaDesc, validation.Required, validation.Length(50, 255)),
+		validation.Field(&c.Title, validation.Required, validation.RuneLength(5, 35)),
+		validation.Field(&c.Subtitle, validation.Required, validation.RuneLength(25, 255)),
+		validation.Field(&c.MetaDesc, validation.Required, validation.RuneLength(50, 255)),
 		validation.Field(&c.Slug, validation.Required),
 	)
 }

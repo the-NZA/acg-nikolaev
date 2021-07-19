@@ -85,13 +85,15 @@ func (s *Server) configureRouter() {
 
 		r.Route("/category", func(r chi.Router) {
 			r.Get("/", s.handleCategoryGetBySlug())
-			r.Get("/all", s.handleCategoryGetAll())
 			r.Post("/", s.handleCategoryCreate())
 			r.Delete("/", s.handleCategoryDelete())
+			r.Get("/all", s.handleCategoryGetAll())
 		})
 
 		r.Route("/post", func(r chi.Router) {
+			r.Get("/", s.handlePostGetBySlug())
 			r.Post("/", s.handlePostCreate())
+			r.Get("/all", s.handlePostGetAll())
 		})
 	})
 	// API END

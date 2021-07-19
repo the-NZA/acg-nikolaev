@@ -12,15 +12,15 @@ import (
 type Post struct {
 	ID         primitive.ObjectID `bson:"_id" json:"_id"`
 	Title      string             `bson:"title,omitempty" json:"title,omitempty"`
-	Excerpt    string             `bson:"excerpt,omitempty" json:"excerpt,omitempty"`
+	Snippet    string             `bson:"snippet,omitempty" json:"snippet,omitempty"`
+	Slug       string             `bson:"slug,omitempty" json:"slug,omitempty"`
 	URL        string             `bson:"url,omitempty" json:"url,omitempty"`
 	CategoryID primitive.ObjectID `bson:"category_id,omitempty" json:"category_id,omitempty"`
 	Time       time.Time          `bson:"time,omitempty" json:"time,omitempty"`
-	// TimeString string             `bson:"timestring,omitempty" json:"timestring,omitempty"`
-	MetaDesc string  `bson:"metadesc,omitempty" json:"metadesc,omitempty"`
-	PostImg  string  `bson:"postimg,omitempty" json:"postimg,omitempty"`
-	PageData []Block `bson:"pagedata,omitempty" json:"pagedata,omitempty"`
-	Deleted  bool    `bson:"deleted" json:"-"`
+	MetaDesc   string             `bson:"metadesc,omitempty" json:"metadesc,omitempty"`
+	PostImg    string             `bson:"postimg,omitempty" json:"postimg,omitempty"`
+	PageData   []Block            `bson:"pagedata,omitempty" json:"pagedata,omitempty"`
+	Deleted    bool               `bson:"deleted" json:"-"`
 }
 
 // TimeString return formated time string
@@ -32,13 +32,14 @@ func (p Post) TimeString() string {
 func (p Post) Validate() error {
 	return validation.ValidateStruct(&p,
 		validation.Field(&p.ID, validation.Required, validation.By(helpers.CheckObjectID)),
-		validation.Field(&p.Title, validation.Required, validation.Length(5, 35)),
-		validation.Field(&p.Excerpt, validation.Required, validation.Length(75, 255)),
-		validation.Field(&p.URL, validation.Required, validation.Length(5, 255)),
+		validation.Field(&p.Title, validation.Required, validation.RuneLength(5, 35)),
+		validation.Field(&p.Snippet, validation.Required, validation.RuneLength(50, 255)),
+		validation.Field(&p.Slug, validation.Required, validation.RuneLength(5, 255)),
+		validation.Field(&p.URL, validation.Required, validation.RuneLength(5, 255)),
 		validation.Field(&p.CategoryID, validation.Required, validation.By(helpers.CheckObjectID)),
-		validation.Field(&p.MetaDesc, validation.Required, validation.Length(50, 255)),
+		validation.Field(&p.MetaDesc, validation.Required, validation.RuneLength(50, 255)),
 		validation.Field(&p.Time, validation.Required),
 		validation.Field(&p.PostImg, validation.Required),
-		validation.Field(&p.PageData, validation.Required, validation.NilOrNotEmpty),
+		validation.Field(&p.PageData, validation.NilOrNotEmpty),
 	)
 }
