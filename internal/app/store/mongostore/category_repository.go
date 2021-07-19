@@ -41,47 +41,62 @@ func (c *CategoryRepository) Create(cat *models.Category) error {
 	return nil
 }
 
-func (c *CategoryRepository) findOne(filter bson.M, opts ...*options.FindOptions) (*models.Category, error) {
-	return nil, nil
+func (c *CategoryRepository) findOne(filter bson.M, opts ...*options.FindOneOptions) (*models.Category, error) {
+	var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
+	db := c.store.db.Database(dbName)
+	col := db.Collection(c.collectionName)
+	res := col.FindOne(ctx, filter, opts...)
+
+	cat := &models.Category{}
+
+	err := res.Decode(cat)
+	if err != nil {
+		return nil, err
+	}
+
+	return cat, nil
 }
 
 // Find category by it ID
 func (c *CategoryRepository) FindByID(ID primitive.ObjectID) (*models.Category, error) {
-	var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+	return c.findOne(bson.M{"_id": ID, "deleted": false})
+	// var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+	// defer cancel()
 
-	db := c.store.db.Database(dbName)
-	col := db.Collection(c.collectionName)
-	res := col.FindOne(ctx, bson.M{"_id": ID, "deleted": false})
+	// db := c.store.db.Database(dbName)
+	// col := db.Collection(c.collectionName)
+	// res := col.FindOne(ctx, bson.M{"_id": ID, "deleted": false})
 
-	cat := &models.Category{}
+	// cat := &models.Category{}
 
-	err := res.Decode(cat)
-	if err != nil {
-		return nil, err
-	}
+	// err := res.Decode(cat)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	return cat, nil
+	// return cat, nil
 }
 
 // FindBySlug finds category by it slug
 func (c *CategoryRepository) FindBySlug(slug string) (*models.Category, error) {
-	var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+	return c.findOne(bson.M{"slug": slug, "deleted": false})
+	// var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+	// defer cancel()
 
-	db := c.store.db.Database(dbName)
-	col := db.Collection(c.collectionName)
-	res := col.FindOne(ctx, bson.M{"slug": slug})
+	// db := c.store.db.Database(dbName)
+	// col := db.Collection(c.collectionName)
+	// res := col.FindOne(ctx, bson.M{"slug": slug})
 
-	cat := &models.Category{}
+	// cat := &models.Category{}
 
-	err := res.Decode(cat)
-	if err != nil {
-		return nil, err
-	}
+	// err := res.Decode(cat)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	return cat, nil
+	// return cat, nil
 }
 
 // FindAll return all categories

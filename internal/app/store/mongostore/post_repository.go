@@ -94,7 +94,22 @@ func (p PostRepository) FindAll(filter bson.M) ([]*models.Post, error) {
 	return posts, nil
 }
 
+func (p PostRepository) updateOne(filter bson.M, update bson.M, opts ...*options.UpdateOptions) error {
+	var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	db := p.store.db.Database(dbName)
+	col := db.Collection(p.collectionName)
+
+	_, err := col.UpdateOne(ctx, filter, update, opts...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Delete marks post as deleted
 func (p PostRepository) Delete(deletedID primitive.ObjectID) error {
-	return nil
+	return p.updateOne(bson.M{"_id": deletedID}, bson.M{"$set": bson.M{"deleted": true}})
 }

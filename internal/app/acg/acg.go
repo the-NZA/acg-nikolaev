@@ -93,6 +93,7 @@ func (s *Server) configureRouter() {
 		r.Route("/post", func(r chi.Router) {
 			r.Get("/", s.handlePostGetBySlug())
 			r.Post("/", s.handlePostCreate())
+			r.Delete("/", s.handlePostDelete())
 			r.Get("/all", s.handlePostGetAll())
 		})
 	})
