@@ -113,6 +113,9 @@ func (s *Server) configureRouter() {
 
 		r.Route("/material", func(r chi.Router) {
 			r.Post("/", s.handleMaterialCreate())
+			r.Get("/", s.handleMaterialGetByID())
+			r.Delete("/", s.handleMaterialDelete())
+			r.Get("/all", s.handleMaterialGetAll())
 		})
 	})
 	// API END
