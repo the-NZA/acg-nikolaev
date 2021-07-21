@@ -481,3 +481,51 @@ func (s *Server) handleMatCategoryGetAll() http.HandlerFunc {
 /*
  * MatCategory handlers END
  */
+
+/*
+ * Material handlers
+ */
+
+func (s *Server) handleMaterialCreate() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		material := &models.Material{
+			ID:   primitive.NewObjectID(),
+			Time: time.Now(),
+		}
+
+		var err error
+
+		if err = json.NewDecoder(r.Body).Decode(material); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		_, err = s.store.MatCategories().FindByID(material.MatCategoryID)
+		if err != nil {
+			switch err {
+			case mongo.ErrNoDocuments:
+				s.logger.Logf("[ERROR] %v\n", helpers.ErrNoCategory)
+				s.error(w, r, http.StatusNotFound, helpers.ErrNoCategory)
+			default:
+				s.logger.Logf("[ERROR] %v\n", err)
+				s.error(w, r, http.StatusInternalServerError, err)
+			}
+			return
+		}
+
+		material.Slug = helpers.GenerateSlug(material.Title)
+
+		if err = s.store.Materials().Create(material); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusCreated, fmt.Sprintf("Material (%s) successfully created", material.ID.Hex()))
+	}
+}
+
+/*
+ * Material handlers END
+ */

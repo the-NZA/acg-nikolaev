@@ -86,7 +86,8 @@ func (s *MongoStore) Materials() store.IMaterialRepository {
 	}
 
 	s.materialsRepository = &MaterialRepository{
-		store: s,
+		store:          s,
+		collectionName: "materials",
 	}
 
 	return s.materialsRepository

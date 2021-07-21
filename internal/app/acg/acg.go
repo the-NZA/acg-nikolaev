@@ -110,6 +110,10 @@ func (s *Server) configureRouter() {
 			r.Delete("/", s.handleMatCategoryDelete())
 			r.Get("/all", s.handleMatCategoryGetAll())
 		})
+
+		r.Route("/material", func(r chi.Router) {
+			r.Post("/", s.handleMaterialCreate())
+		})
 	})
 	// API END
 }

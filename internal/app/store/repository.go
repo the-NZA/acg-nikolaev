@@ -27,7 +27,9 @@ type ICategoryRepository interface {
 // IMaterialRepository defines interface for material repository
 type IMaterialRepository interface {
 	Create(*models.Material) error
-	Find(string) (*models.Material, error)
+	FindByID(primitive.ObjectID) (*models.Material, error)
+	FindBySlug(string) (*models.Material, error)
+	FindAll(bson.M) ([]*models.Material, error)
 	Delete(primitive.ObjectID) error
 }
 

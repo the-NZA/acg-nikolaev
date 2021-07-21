@@ -32,7 +32,7 @@ func (p Post) TimeString() string {
 func (p Post) Validate() error {
 	return validation.ValidateStruct(&p,
 		validation.Field(&p.ID, validation.Required, validation.By(helpers.CheckObjectID)),
-		validation.Field(&p.Title, validation.Required, validation.RuneLength(5, 35)),
+		validation.Field(&p.Title, validation.Required, validation.RuneLength(5, 55)),
 		validation.Field(&p.Snippet, validation.Required, validation.RuneLength(50, 255)),
 		validation.Field(&p.Slug, validation.Required, validation.RuneLength(5, 255)),
 		validation.Field(&p.URL, validation.Required, validation.RuneLength(5, 255)),

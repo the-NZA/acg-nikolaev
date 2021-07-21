@@ -15,14 +15,15 @@ type MatCategory struct {
 	Deleted bool               `bson:"deleted" json:"-"`
 }
 
+// URL returns format url with format: "/matcategory/matcategory_slug"
 func (m MatCategory) URL() string {
-	return "matcategory" + m.Slug
+	return "/matcategory/" + m.Slug
 }
 
 func (m MatCategory) Validate() error {
 	return validation.ValidateStruct(&m,
 		validation.Field(&m.ID, validation.Required, validation.By(helpers.CheckObjectID)),
-		validation.Field(&m.Title, validation.Required, validation.RuneLength(5, 35)),
+		validation.Field(&m.Title, validation.Required, validation.RuneLength(5, 55)),
 		validation.Field(&m.Desc, validation.Required, validation.RuneLength(50, 255)),
 		validation.Field(&m.Slug, validation.Required),
 	)
