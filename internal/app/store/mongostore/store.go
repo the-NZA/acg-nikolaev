@@ -112,7 +112,8 @@ func (s *MongoStore) Users() store.IUserRepository {
 	}
 
 	s.userRepository = &UserRepository{
-		store: s,
+		store:          s,
+		collectionName: "users",
 	}
 
 	return s.userRepository

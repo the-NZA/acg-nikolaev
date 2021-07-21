@@ -117,6 +117,11 @@ func (s *Server) configureRouter() {
 			r.Delete("/", s.handleMaterialDelete())
 			r.Get("/all", s.handleMaterialGetAll())
 		})
+
+		r.Route("/user", func(r chi.Router) {
+			r.Post("/", s.handleUserCreate())
+			r.Delete("/", s.handleUserDelete())
+		})
 	})
 	// API END
 }

@@ -45,7 +45,7 @@ type IMatCategoryRepository interface {
 // IUserRepository defines interface for user repository
 type IUserRepository interface {
 	Create(*models.User) error
-	Find(string) (*models.User, error)
+	// Find(string) (*models.User, error)
 	Delete(primitive.ObjectID) error
 }
 

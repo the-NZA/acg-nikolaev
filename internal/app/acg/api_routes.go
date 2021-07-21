@@ -607,3 +607,43 @@ func (s *Server) handleMatCategoryGetAll() http.HandlerFunc {
 /*
  * Material handlers END
  */
+
+/*
+ * User handlers
+ */
+func (s *Server) handleUserCreate() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		usr := &models.User{
+			ID: primitive.NewObjectID(),
+		}
+
+		var err error
+
+		if err = json.NewDecoder(r.Body).Decode(usr); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		// s.logger.Logf("[DEBUG] %v\n", usr)
+		// w.Write([]byte("placeholder"))
+
+		if err = s.store.Users().Create(usr); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusCreated, fmt.Sprintf("User '%s' successfully created", usr.Username))
+	}
+}
+
+func (s *Server) handleUserDelete() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+	}
+}
+
+/*
+ * User handlers END
+ */
