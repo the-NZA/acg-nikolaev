@@ -5,7 +5,7 @@ type Storer interface {
 	Posts() IPostRepository
 	Categories() ICategoryRepository
 	Materials() IMaterialRepository
-	MatCategoies() IMatCategoryRepository
+	MatCategories() IMatCategoryRepository
 	Users() IUserRepository
 	Services() IServiceRepository
 	// Pages()

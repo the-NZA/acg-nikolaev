@@ -368,3 +368,38 @@ func (s *Server) handleServiceGetAll() http.HandlerFunc {
 /*
  * Service handlers END
  */
+
+/*
+ * MatCategory handlers
+ */
+
+func (s *Server) handleMatCategoryCreate() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		matcat := &models.MatCategory{
+			ID: primitive.NewObjectID(),
+		}
+
+		var err error
+
+		if err = json.NewDecoder(r.Body).Decode(matcat); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		matcat.Slug = helpers.GenerateSlug(matcat.Title)
+
+		if err = s.store.MatCategories().Create(matcat); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusCreated, fmt.Sprintf("Material category (%s) successfully created", matcat.ID.Hex()))
+
+	}
+}
+
+/*
+ * MatCategory handlers END
+ */

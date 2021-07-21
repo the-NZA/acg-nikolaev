@@ -92,13 +92,14 @@ func (s *Store) Materials() store.IMaterialRepository {
 	return s.materialsRepository
 }
 
-func (s *Store) MatCategoies() store.IMatCategoryRepository {
+func (s *Store) MatCategories() store.IMatCategoryRepository {
 	if s.matCatRepository != nil {
 		return s.matCatRepository
 	}
 
 	s.matCatRepository = &MatCatRepository{
-		store: s,
+		store:          s,
+		collectionName: "matcategories",
 	}
 
 	return s.matCatRepository

@@ -103,6 +103,10 @@ func (s *Server) configureRouter() {
 			r.Delete("/", s.handleServiceDelete())
 			r.Get("/all", s.handleServiceGetAll())
 		})
+
+		r.Route("/matcategory", func(r chi.Router) {
+			r.Post("/", s.handleMatCategoryCreate())
+		})
 	})
 	// API END
 }
