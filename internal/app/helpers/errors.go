@@ -11,4 +11,5 @@ var (
 	ErrServiceAlreadyExist  = errors.New("Service already with exist")
 	ErrCategoryAlreadyExist = errors.New("Category already exist")
 	ErrInvalidObjectID      = errors.New("ObjectID must be valid")
+	ErrEmptyObjectID        = errors.New("You need to specify correct ObjectID")
 )

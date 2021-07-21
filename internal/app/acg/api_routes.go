@@ -117,6 +117,12 @@ func (s *Server) handleCategoryDelete() http.HandlerFunc {
 			return
 		}
 
+		if req.ID.IsZero() {
+			s.logger.Logf("[ERROR] %v\n", helpers.ErrEmptyObjectID)
+			s.error(w, r, http.StatusInternalServerError, helpers.ErrEmptyObjectID)
+			return
+		}
+
 		if err = s.store.Categories().Delete(req.ID); err != nil {
 			s.logger.Logf("[ERROR] %v\n", err)
 			s.error(w, r, http.StatusInternalServerError, err)
@@ -219,6 +225,12 @@ func (s *Server) handlePostDelete() http.HandlerFunc {
 			return
 		}
 
+		if req.ID.IsZero() {
+			s.logger.Logf("[ERROR] %v\n", helpers.ErrEmptyObjectID)
+			s.error(w, r, http.StatusInternalServerError, helpers.ErrEmptyObjectID)
+			return
+		}
+
 		if err = s.store.Posts().Delete(req.ID); err != nil {
 			s.logger.Logf("[ERROR] %v\n", err)
 			s.error(w, r, http.StatusInternalServerError, err)
@@ -307,6 +319,36 @@ func (s *Server) handleServiceGetByID() http.HandlerFunc {
 			s.error(w, r, http.StatusInternalServerError, err)
 			return
 		}
+	}
+}
+
+func (s *Server) handleServiceDelete() http.HandlerFunc {
+	type req struct {
+		ID primitive.ObjectID `json:"deletedID"`
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := &req{}
+		var err error
+
+		if err = json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		if req.ID.IsZero() {
+			s.logger.Logf("[ERROR] %v\n", helpers.ErrEmptyObjectID)
+			s.error(w, r, http.StatusInternalServerError, helpers.ErrEmptyObjectID)
+			return
+		}
+
+		if err = s.store.Services().Delete(req.ID); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, fmt.Sprintf("Service (%s) successfully deleted", req.ID.Hex()))
 	}
 }
 
