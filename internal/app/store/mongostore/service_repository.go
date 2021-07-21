@@ -13,7 +13,7 @@ import (
 
 // ServiceRepository implements IServiceRepository
 type ServiceRepository struct {
-	store          *Store
+	store          *MongoStore
 	collectionName string
 }
 

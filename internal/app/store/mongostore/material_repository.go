@@ -7,7 +7,7 @@ import (
 
 // MaterialRepository implements IMaterialRepository
 type MaterialRepository struct {
-	store *Store
+	store *MongoStore
 }
 
 // Create save new material

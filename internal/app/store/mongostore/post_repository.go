@@ -13,7 +13,7 @@ import (
 
 // PostRepository implements IPostRepository
 type PostRepository struct {
-	store          *Store
+	store          *MongoStore
 	collectionName string
 }
 

@@ -13,7 +13,7 @@ import (
 
 // MatCatRepository implements IMatCatRepository
 type MatCatRepository struct {
-	store          *Store
+	store          *MongoStore
 	collectionName string
 }
 
@@ -28,7 +28,7 @@ func (m MatCatRepository) Create(matcat *models.MatCategory) error {
 
 	fcat, _ := m.FindBySlug(matcat.Slug)
 	if fcat != nil {
-		return helpers.ErrCategoryAlreadyExist
+		return helpers.ErrMatCategoryAlreadyExist
 	}
 
 	db := m.store.db.Database(dbName)

@@ -13,7 +13,7 @@ import (
 
 // CategoryRepository implements ICategoryRepository
 type CategoryRepository struct {
-	store          *Store
+	store          *MongoStore
 	collectionName string
 }
 

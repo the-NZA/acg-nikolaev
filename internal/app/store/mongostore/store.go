@@ -12,8 +12,8 @@ import (
 // Because of one DB is used decided to store name as const string
 const dbName = "acg_db"
 
-// Store represents abstraction for MongoDB
-type Store struct {
+// MongoStore represents abstraction for MongoDB
+type MongoStore struct {
 	db                  *mongo.Client
 	postRepository      *PostRepository
 	categoryRepository  *CategoryRepository
@@ -41,20 +41,20 @@ func NewStore(dbURL string) (store.Storer, error) {
 		return nil, err
 	}
 
-	return &Store{
+	return &MongoStore{
 		db: client,
 	}, nil
 }
 
 // Close just aborts the connection
-func (s *Store) Close() {
+func (s *MongoStore) Close() {
 	s.db.Disconnect(dbctx)
 }
 
 /*
  * Implement Storer interface
  */
-func (s *Store) Posts() store.IPostRepository {
+func (s *MongoStore) Posts() store.IPostRepository {
 	if s.postRepository != nil {
 		return s.postRepository
 	}
@@ -67,7 +67,7 @@ func (s *Store) Posts() store.IPostRepository {
 	return s.postRepository
 }
 
-func (s *Store) Categories() store.ICategoryRepository {
+func (s *MongoStore) Categories() store.ICategoryRepository {
 	if s.categoryRepository != nil {
 		return s.categoryRepository
 	}
@@ -80,7 +80,7 @@ func (s *Store) Categories() store.ICategoryRepository {
 	return s.categoryRepository
 }
 
-func (s *Store) Materials() store.IMaterialRepository {
+func (s *MongoStore) Materials() store.IMaterialRepository {
 	if s.materialsRepository != nil {
 		return s.materialsRepository
 	}
@@ -92,7 +92,7 @@ func (s *Store) Materials() store.IMaterialRepository {
 	return s.materialsRepository
 }
 
-func (s *Store) MatCategories() store.IMatCategoryRepository {
+func (s *MongoStore) MatCategories() store.IMatCategoryRepository {
 	if s.matCatRepository != nil {
 		return s.matCatRepository
 	}
@@ -105,7 +105,7 @@ func (s *Store) MatCategories() store.IMatCategoryRepository {
 	return s.matCatRepository
 }
 
-func (s *Store) Users() store.IUserRepository {
+func (s *MongoStore) Users() store.IUserRepository {
 	if s.userRepository != nil {
 		return s.userRepository
 	}
@@ -117,7 +117,7 @@ func (s *Store) Users() store.IUserRepository {
 	return s.userRepository
 }
 
-func (s *Store) Services() store.IServiceRepository {
+func (s *MongoStore) Services() store.IServiceRepository {
 	if s.serviceRepository != nil {
 		return s.serviceRepository
 	}

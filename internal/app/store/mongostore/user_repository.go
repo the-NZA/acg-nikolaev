@@ -7,7 +7,7 @@ import (
 
 // UserRepository implements IUserRepository
 type UserRepository struct {
-	store *Store
+	store *MongoStore
 }
 
 // Create save new post
