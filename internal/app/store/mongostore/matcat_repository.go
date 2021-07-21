@@ -71,7 +71,25 @@ func (m MatCatRepository) FindByID(ID primitive.ObjectID) (*models.MatCategory, 
 
 // FindAll return all material repositories with specified filter
 func (m MatCatRepository) FindAll(filter bson.M) ([]*models.MatCategory, error) {
-	return nil, nil
+	var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	db := m.store.db.Database(dbName)
+	col := db.Collection(m.collectionName)
+
+	res, err := col.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	matcats := make([]*models.MatCategory, 0)
+
+	err = res.All(ctx, &matcats)
+	if err != nil {
+		return nil, err
+	}
+
+	return matcats, nil
 }
 
 func (m MatCatRepository) updateOne(filter bson.M, update bson.M, opts ...*options.UpdateOptions) error {
