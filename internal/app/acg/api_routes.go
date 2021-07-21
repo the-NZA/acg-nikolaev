@@ -352,6 +352,19 @@ func (s *Server) handleServiceDelete() http.HandlerFunc {
 	}
 }
 
+func (s *Server) handleServiceGetAll() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		services, err := s.store.Services().FindAll(bson.M{"deleted": false})
+		if err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, services)
+	}
+}
+
 /*
  * Service handlers END
  */

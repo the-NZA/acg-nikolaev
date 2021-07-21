@@ -101,6 +101,7 @@ func (s *Server) configureRouter() {
 			r.Get("/", s.handleServiceGetByID())
 			r.Post("/", s.handleServiceCreate())
 			r.Delete("/", s.handleServiceDelete())
+			r.Get("/all", s.handleServiceGetAll())
 		})
 	})
 	// API END
