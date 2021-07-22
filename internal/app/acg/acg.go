@@ -124,6 +124,14 @@ func (s *Server) configureRouter() {
 		})
 	})
 	// API END
+
+	// Auth Routes
+	s.router.Route("/auth", func(r chi.Router) {
+		r.Get("/", s.handleAuthRoot())
+		r.Post("/login", s.handleAuthLogin())
+		r.Post("/logout", s.handleAuthLogout())
+	})
+	// Auth END
 }
 
 // configureStore creates new Store and try to establish connection
