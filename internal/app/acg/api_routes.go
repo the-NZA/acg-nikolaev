@@ -625,9 +625,6 @@ func (s *Server) handleUserCreate() http.HandlerFunc {
 			return
 		}
 
-		// s.logger.Logf("[DEBUG] %v\n", usr)
-		// w.Write([]byte("placeholder"))
-
 		if err = s.store.Users().Create(usr); err != nil {
 			s.logger.Logf("[ERROR] %v\n", err)
 			s.error(w, r, http.StatusInternalServerError, err)

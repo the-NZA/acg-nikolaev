@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"flag"
 	"io"
-	"log"
 	"os"
 
+	log "github.com/go-pkgz/lgr"
 	"github.com/the-NZA/acg-nikolaev/internal/app/acg"
 )
 
@@ -24,24 +24,24 @@ func main() {
 	config := acg.NewConfig()
 	jsonFile, err := os.Open(configPath)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("[ERROR] %v\n", err)
 	}
 
 	defer jsonFile.Close()
 
 	configBytes, err := io.ReadAll(jsonFile)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("[ERROR] %v\n", err)
 	}
 
 	err = json.Unmarshal(configBytes, &config)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("[ERROR] %v\n", err)
 	}
 
 	s := acg.NewServer(config)
 	if err := s.Start(); err != nil {
-		log.Fatal(err)
+		log.Fatalf("[ERROR] %v\n", err)
 	}
 
 }
