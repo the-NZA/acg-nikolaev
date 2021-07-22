@@ -127,6 +127,15 @@ func (s *Server) configureRouter() {
 
 	// Auth Routes
 	s.router.Route("/auth", func(r chi.Router) {
+		r.Use(func(next http.Handler) http.Handler {
+			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+				s.logger.Logf("[INFO] This is message from middleware\n")
+
+				next.ServeHTTP(w, r)
+			})
+		})
+
 		r.Get("/", s.handleAuthRoot())
 		r.Post("/login", s.handleAuthLogin())
 		r.Post("/logout", s.handleAuthLogout())
