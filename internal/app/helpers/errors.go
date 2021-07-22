@@ -11,6 +11,7 @@ var (
 	ErrNoService               = errors.New("Service does not exist yet")
 	ErrPostAlreadyExist        = errors.New("Post already exist")
 	ErrUserAlreadyExist        = errors.New("User already exist")
+	ErrEmailAlreadyExist       = errors.New("Email already taken")
 	ErrMaterialAlreadyExist    = errors.New("Material already exist")
 	ErrServiceAlreadyExist     = errors.New("Service already exist")
 	ErrCategoryAlreadyExist    = errors.New("Category already exist")

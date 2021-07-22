@@ -26,17 +26,19 @@ func (u UserRepository) Create(usr *models.User) error {
 		return err
 	}
 
+	// If username already taken
 	fusr, _ := u.FindByUsername(usr.Username)
 	if fusr != nil {
 		return helpers.ErrUserAlreadyExist
 	}
 
+	// If email already taken
 	fusr, _ = u.FindByEmail(usr.Email)
 	if fusr != nil {
-		return helpers.ErrUserAlreadyExist
+		return helpers.ErrEmailAlreadyExist
 	}
 
-	if err := usr.HashPassword(usr.Password); err != nil {
+	if err := usr.BeforeSave(); err != nil {
 		return err
 	}
 

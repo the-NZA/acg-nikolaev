@@ -157,7 +157,7 @@ func (s *Server) Start() error {
 		return err
 	}
 
-	s.logger.Logf("INFO Server is starting at %v...\n", s.config.BindAddr)
+	s.logger.Logf("[INFO] Server is starting at %v...\n", s.config.BindAddr)
 
 	return http.ListenAndServe(s.config.BindAddr, s.router)
 }
