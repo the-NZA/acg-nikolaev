@@ -636,8 +636,32 @@ func (s *Server) handleUserCreate() http.HandlerFunc {
 }
 
 func (s *Server) handleUserDelete() http.HandlerFunc {
+	type req struct {
+		ID primitive.ObjectID `json:"deletedID"`
+	}
 	return func(w http.ResponseWriter, r *http.Request) {
+		req := &req{}
+		var err error
 
+		if err = json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		if req.ID.IsZero() {
+			s.logger.Logf("[ERROR] %v\n", helpers.ErrEmptyObjectID)
+			s.error(w, r, http.StatusInternalServerError, helpers.ErrEmptyObjectID)
+			return
+		}
+
+		if err = s.store.Users().Delete(req.ID); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, fmt.Sprintf("User (%s) successfully deleted", req.ID.Hex()))
 	}
 }
 

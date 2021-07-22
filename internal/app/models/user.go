@@ -18,6 +18,7 @@ type User struct {
 	EncryptedPassword string             `bson:"pswd" json:"-"`
 	Password          string             `bson:"-" json:"pswd"`
 	Email             string             `bson:"email,omitempty" json:"email,omitempty"`
+	deleted           bool               `bson:"deleted" json:"-"`
 }
 
 // Validate user struct

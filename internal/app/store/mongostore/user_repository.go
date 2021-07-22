@@ -74,15 +74,30 @@ func (u UserRepository) findOne(filter bson.M, opts ...*options.FindOneOptions) 
 
 // FindByUsername look up user by his username
 func (u UserRepository) FindByUsername(username string) (*models.User, error) {
-	return u.findOne(bson.M{"username": username})
+	return u.findOne(bson.M{"username": username, "deleted": false})
 }
 
 // FindByEmail look up user by his email
 func (u UserRepository) FindByEmail(email string) (*models.User, error) {
-	return u.findOne(bson.M{"email": email})
+	return u.findOne(bson.M{"email": email, "deleted": false})
 }
 
-// Delete marks post as deleted
-func (p UserRepository) Delete(deletedID primitive.ObjectID) error {
+func (u UserRepository) updateOne(filter bson.M, update bson.M, opts ...*options.UpdateOptions) error {
+	var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	db := u.store.db.Database(dbName)
+	col := db.Collection(u.collectionName)
+
+	_, err := col.UpdateOne(ctx, filter, update, opts...)
+	if err != nil {
+		return err
+	}
+
 	return nil
+}
+
+// Delete marks user as deleted
+func (u UserRepository) Delete(deletedID primitive.ObjectID) error {
+	return u.updateOne(bson.M{"_id": deletedID}, bson.M{"$set": bson.M{"deleted": true}})
 }
