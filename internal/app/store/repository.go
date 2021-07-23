@@ -47,6 +47,7 @@ type IUserRepository interface {
 	Create(*models.User) error
 	// Find(string) (*models.User, error)
 	Delete(primitive.ObjectID) error
+	Login(string, string) error
 }
 
 // IServiceRepository defines interface for service repository

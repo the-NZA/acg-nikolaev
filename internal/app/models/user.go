@@ -76,7 +76,16 @@ func (u *User) hashPassword(pass string) error {
 	return nil
 }
 
+// DoLogin tries to login user
+func (u User) DoLogin() error {
+	if err := u.comparePasswords(u.Password); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // ComparePassword checks equality of given string and hashed passwords
-func (u User) ComparePassword(p string) error {
+func (u User) comparePasswords(p string) error {
 	return bcrypt.CompareHashAndPassword([]byte(u.EncryptedPassword), []byte(p))
 }

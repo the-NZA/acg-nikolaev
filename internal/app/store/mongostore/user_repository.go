@@ -101,3 +101,17 @@ func (u UserRepository) updateOne(filter bson.M, update bson.M, opts ...*options
 func (u UserRepository) Delete(deletedID primitive.ObjectID) error {
 	return u.updateOne(bson.M{"_id": deletedID}, bson.M{"$set": bson.M{"deleted": true}})
 }
+
+func (u UserRepository) Login(username, password string) error {
+	fusr, err := u.FindByUsername(username)
+	if err != nil {
+		return err
+	}
+
+	fusr.Password = password
+	if err := fusr.DoLogin(); err != nil {
+		return err
+	}
+
+	return nil
+}

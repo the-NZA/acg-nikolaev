@@ -129,8 +129,8 @@ func (s *Server) configureRouter() {
 	s.router.Route("/auth", func(r chi.Router) {
 		r.Use(func(next http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 				s.logger.Logf("[INFO] This is message from middleware\n")
+				// s.logger.Logf("[DEBUG] %v \n", r.Body)
 
 				next.ServeHTTP(w, r)
 			})
