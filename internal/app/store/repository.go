@@ -1,6 +1,7 @@
 package store
 
 import (
+	"github.com/the-NZA/acg-nikolaev/internal/app/auth"
 	"github.com/the-NZA/acg-nikolaev/internal/app/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -47,7 +48,7 @@ type IUserRepository interface {
 	Create(*models.User) error
 	// Find(string) (*models.User, error)
 	Delete(primitive.ObjectID) error
-	Login(string, string) error
+	Login(string, string, string) (*auth.TokenWithExpTime, error)
 }
 
 // IServiceRepository defines interface for service repository

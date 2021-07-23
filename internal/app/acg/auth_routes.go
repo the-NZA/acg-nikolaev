@@ -2,7 +2,6 @@ package acg
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/the-NZA/acg-nikolaev/internal/app/helpers"
@@ -40,13 +39,24 @@ func (s *Server) handleAuthLogin() http.HandlerFunc {
 			return
 		}
 
-		if err = s.store.Users().Login(cred.Username, cred.Password); err != nil {
+		token, err := s.store.Users().Login(cred.Username, cred.Password, s.config.SecretKey)
+		if err != nil {
 			s.logger.Logf("[ERROR] %v\n", err)
 			s.error(w, r, http.StatusInternalServerError, err)
 			return
 		}
 
-		s.respond(w, r, http.StatusOK, fmt.Sprintf("User (%v) successfully auth'ed", cred.Username))
+		http.SetCookie(w, &http.Cookie{
+			Name:     "TKN",
+			Value:    token.Token,
+			Expires:  token.ExpTime,
+			HttpOnly: true,
+		})
+
+		s.respond(w, r, http.StatusOK, map[string]string{
+			"user":  cred.Username,
+			"token": token.Token,
+		})
 	}
 }
 

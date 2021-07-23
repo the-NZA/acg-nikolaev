@@ -3,6 +3,7 @@ package models
 import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
+	"github.com/the-NZA/acg-nikolaev/internal/app/auth"
 	"github.com/the-NZA/acg-nikolaev/internal/app/helpers"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
@@ -77,12 +78,14 @@ func (u *User) hashPassword(pass string) error {
 }
 
 // DoLogin tries to login user
-func (u User) DoLogin() error {
+func (u User) DoLogin(secret string) (*auth.TokenWithExpTime, error) {
 	if err := u.comparePasswords(u.Password); err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return auth.CreateToken(u.Username, secret)
+
+	// return "", nil
 }
 
 // ComparePassword checks equality of given string and hashed passwords
