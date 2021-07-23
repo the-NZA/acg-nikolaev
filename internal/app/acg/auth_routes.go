@@ -51,6 +51,8 @@ func (s *Server) handleAuthLogin() http.HandlerFunc {
 			Value:    token.Token,
 			Expires:  token.ExpTime,
 			HttpOnly: true,
+			Path:     "/",
+			Domain:   "acg-nikolaev.local",
 		})
 
 		s.respond(w, r, http.StatusOK, map[string]string{
