@@ -3,6 +3,7 @@ package acg
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/the-NZA/acg-nikolaev/internal/app/helpers"
 )
@@ -64,8 +65,16 @@ func (s *Server) handleAuthLogin() http.HandlerFunc {
 
 func (s *Server) handleAuthLogout() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		http.SetCookie(w, &http.Cookie{
+			Name:     "TKN",
+			Expires:  time.Unix(0, 0),
+			HttpOnly: true,
+			Path:     "/",
+			Domain:   "acg-nikolaev.local",
+		})
+
 		s.respond(w, r, http.StatusOK, map[string]string{
-			"logout": "this is placeholder",
+			"logout": "successful",
 		})
 	}
 }

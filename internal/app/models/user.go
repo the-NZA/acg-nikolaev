@@ -84,8 +84,6 @@ func (u User) DoLogin(secret string) (*auth.TokenWithExpTime, error) {
 	}
 
 	return auth.CreateToken(u.Username, secret)
-
-	// return "", nil
 }
 
 // ComparePassword checks equality of given string and hashed passwords
