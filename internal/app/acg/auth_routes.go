@@ -32,8 +32,6 @@ func (s *Server) handleAuthLogin() http.HandlerFunc {
 			return
 		}
 
-		s.logger.Logf("[DEBUG] %v with %v\n", cred.Username, cred.Password)
-
 		if cred.Username == "" || cred.Password == "" {
 			// s.logger.Logf("[ERROR] %v\n", http.StatusBadRequest)
 			s.error(w, r, http.StatusBadRequest, helpers.ErrNoBodyParams)

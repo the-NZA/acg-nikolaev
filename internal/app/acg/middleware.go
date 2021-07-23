@@ -24,7 +24,7 @@ func (s *Server) authMiddleware(next http.Handler) http.Handler {
 			}
 		}
 
-		s.logger.Logf("[DEBUG] %v\n", token.Value)
+		// s.logger.Logf("[DEBUG] %v\n", token.Value)
 
 		// try to verify token and maybe go to 'next'
 		if err = auth.CheckToken(token.Value, s.config.SecretKey); err != nil {
@@ -33,7 +33,7 @@ func (s *Server) authMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		s.logger.Logf("[DEBUG] Auth'ed\n")
+		// s.logger.Logf("[DEBUG] Auth'ed\n")
 		next.ServeHTTP(w, r)
 	})
 }

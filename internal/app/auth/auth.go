@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	log "github.com/go-pkgz/lgr"
 	"github.com/golang-jwt/jwt"
 	"github.com/the-NZA/acg-nikolaev/internal/app/helpers"
 )
@@ -35,8 +34,8 @@ func CreateToken(username, secret string) (*TokenWithExpTime, error) {
 
 func CheckToken(tokenString, secret string) error {
 	tok, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(t *jwt.Token) (interface{}, error) {
-		if s, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			log.Printf("[DEBUG] %v\n", s)
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			// log.Printf("[DEBUG] %v\n", s)
 			return nil, fmt.Errorf("Unexpected token signing: %v", t.Header["alg"])
 		}
 
@@ -44,12 +43,10 @@ func CheckToken(tokenString, secret string) error {
 	})
 
 	if err != nil {
-		log.Printf("[ERROR] %v\n", err)
 		return err
 	}
 
 	if !tok.Valid {
-		log.Printf("[ERROR] %v\n", tok)
 		return helpers.ErrUnauthorized
 	}
 
