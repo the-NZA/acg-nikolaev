@@ -79,27 +79,10 @@ func (s *Server) configureRouter() {
 
 	// API Routes
 	s.router.Route("/api", func(r chi.Router) {
-		r.Use(func(next http.Handler) http.Handler {
-			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				// s.logger.Logf("[INFO] This is message from middleware\n")
-				// s.logger.Logf("[DEBUG] %v \n", r.Body)
-				cookie, err := r.Cookie("TKN")
-				if err != nil {
-					s.logger.Logf("[ERROR] %v\n", err)
-					s.error(w, r, http.StatusInternalServerError, err)
-					return
-				}
-
-				s.logger.Logf("[DEBUG] %v\n", cookie)
-
-				// try to verify token and maybe go to 'next'
-
-				next.ServeHTTP(w, r)
-			})
-		})
+		r.Use(s.authMiddleware)
 
 		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("This is api"))
+			s.respond(w, r, http.StatusOK, "This is API endpoint")
 		})
 
 		r.Route("/category", func(r chi.Router) {
