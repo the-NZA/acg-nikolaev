@@ -9,19 +9,9 @@ import (
 )
 
 const (
-	tokenTTL  = 2
-	renewTime = 5
+	tokenTTL  = 2 // Number of living hours for token
+	renewTime = 5 // Number of minutes needed to start token update process
 )
-
-type CustomClaims struct {
-	Username string
-	jwt.StandardClaims
-}
-
-type TokenWithExpTime struct {
-	Token   string
-	ExpTime time.Time
-}
 
 // CreateToken generate new token with passed params
 func CreateToken(username, secret string) (string, time.Time, error) {
@@ -63,10 +53,38 @@ func CheckToken(tokenString, secret string) (bool, error) {
 		curTm := time.Now()
 		dur := expTm.Sub(curTm)
 
-		if dur.Hours() < renewTime {
+		if dur.Minutes() < renewTime {
 			return true, nil
 		}
 	}
 
 	return false, nil
+}
+
+// UpdateToken generates and  returns new token, expTime and error
+func UpdateToken(oldToken, secret string) (string, time.Time, error) {
+	oldTokParsed, err := jwt.Parse(oldToken, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected token signing: %v", t.Header["alg"])
+		}
+
+		return []byte(secret), nil
+	})
+
+	if err != nil {
+		return "", time.Time{}, err
+	}
+
+	oldClaimg, ok := oldTokParsed.Claims.(jwt.MapClaims)
+	if !ok {
+		return "", time.Time{}, fmt.Errorf("Error during updating token")
+	}
+
+	username, ok := oldClaimg["username"].(string)
+	if !ok {
+		return "", time.Time{}, fmt.Errorf("Can't extract one or more claims fields")
+	}
+
+	return CreateToken(username, secret)
+
 }
