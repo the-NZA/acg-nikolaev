@@ -38,7 +38,7 @@ func (s *Server) handleAuthLogin() http.HandlerFunc {
 			return
 		}
 
-		token, err := s.store.Users().Login(cred.Username, cred.Password, s.config.SecretKey)
+		token, expTime, err := s.store.Users().Login(cred.Username, cred.Password, s.config.SecretKey)
 		if err != nil {
 			s.logger.Logf("[ERROR] %v\n", err)
 			s.error(w, r, http.StatusInternalServerError, err)
@@ -47,8 +47,8 @@ func (s *Server) handleAuthLogin() http.HandlerFunc {
 
 		http.SetCookie(w, &http.Cookie{
 			Name:     "TKN",
-			Value:    token.Token,
-			Expires:  token.ExpTime,
+			Value:    token,
+			Expires:  expTime,
 			HttpOnly: true,
 			Path:     "/",
 			Domain:   "acg-nikolaev.local",
@@ -56,7 +56,7 @@ func (s *Server) handleAuthLogin() http.HandlerFunc {
 
 		s.respond(w, r, http.StatusOK, map[string]string{
 			"user":  cred.Username,
-			"token": token.Token,
+			"token": token,
 		})
 	}
 }

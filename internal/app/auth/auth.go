@@ -8,6 +8,11 @@ import (
 	"github.com/the-NZA/acg-nikolaev/internal/app/helpers"
 )
 
+const (
+	tokenTTL  = 2
+	renewTime = 5
+)
+
 type CustomClaims struct {
 	Username string
 	jwt.StandardClaims
@@ -18,24 +23,24 @@ type TokenWithExpTime struct {
 	ExpTime time.Time
 }
 
-func CreateToken(username, secret string) (*TokenWithExpTime, error) {
-	expTime := time.Now().Add(1 * time.Hour)
+// CreateToken generate new token with passed params
+func CreateToken(username, secret string) (string, time.Time, error) {
+	expTime := time.Now().Add(tokenTTL * time.Hour)
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, CustomClaims{
-		Username: username,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expTime.Unix(),
-		},
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"username": username,
+		"exp":      expTime.Unix(),
 	})
 
 	stoken, err := token.SignedString([]byte(secret))
-	return &TokenWithExpTime{Token: stoken, ExpTime: expTime}, err
+	return stoken, expTime, err
 }
 
-func CheckToken(tokenString, secret string) error {
-	tok, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(t *jwt.Token) (interface{}, error) {
+// CheckToken verify tokenString with given secret and return bool and error
+// bool – signals that token may be updated
+func CheckToken(tokenString, secret string) (bool, error) {
+	tok, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			// log.Printf("[DEBUG] %v\n", s)
 			return nil, fmt.Errorf("Unexpected token signing: %v", t.Header["alg"])
 		}
 
@@ -43,12 +48,25 @@ func CheckToken(tokenString, secret string) error {
 	})
 
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	if !tok.Valid {
-		return helpers.ErrUnauthorized
+		return false, helpers.ErrUnauthorized
 	}
 
-	return nil
+	// Check if exp time less than
+	if claims, ok := tok.Claims.(jwt.MapClaims); ok {
+		exp := int64(claims["exp"].(float64))
+
+		expTm := time.Unix(exp, 0)
+		curTm := time.Now()
+		dur := expTm.Sub(curTm)
+
+		if dur.Hours() < renewTime {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }

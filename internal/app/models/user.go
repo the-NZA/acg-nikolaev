@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/the-NZA/acg-nikolaev/internal/app/auth"
@@ -78,9 +80,9 @@ func (u *User) hashPassword(pass string) error {
 }
 
 // DoLogin tries to login user
-func (u User) DoLogin(secret string) (*auth.TokenWithExpTime, error) {
+func (u User) DoLogin(secret string) (string, time.Time, error) {
 	if err := u.comparePasswords(u.Password); err != nil {
-		return nil, err
+		return "", time.Time{}, err
 	}
 
 	return auth.CreateToken(u.Username, secret)

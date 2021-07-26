@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/the-NZA/acg-nikolaev/internal/app/auth"
 	"github.com/the-NZA/acg-nikolaev/internal/app/helpers"
 	"github.com/the-NZA/acg-nikolaev/internal/app/models"
 	"go.mongodb.org/mongo-driver/bson"
@@ -103,18 +102,18 @@ func (u UserRepository) Delete(deletedID primitive.ObjectID) error {
 	return u.updateOne(bson.M{"_id": deletedID}, bson.M{"$set": bson.M{"deleted": true}})
 }
 
-func (u UserRepository) Login(username, password, secret string) (*auth.TokenWithExpTime, error) {
+func (u UserRepository) Login(username, password, secret string) (string, time.Time, error) {
 	fusr, err := u.FindByUsername(username)
 	if err != nil {
-		return nil, err
+		return "", time.Time{}, err
 	}
 
 	fusr.Password = password
 
-	token, err := fusr.DoLogin(secret)
+	token, expTime, err := fusr.DoLogin(secret)
 	if err != nil {
-		return nil, err
+		return "", time.Time{}, err
 	}
 
-	return token, nil
+	return token, expTime, nil
 }
