@@ -1,4 +1,6 @@
 {
+	"app_domain": "YOUR-DOMAIN",
+	"app_port": ":YOUR-PORT",
 	"bind_addr": "YOUR-DOMAIN:YOUR-PORT",
 	"db_url": "mongodb://YOUR-DB-DOMAIN:YOUR-DB-PORT",
 	"log_debug": true,

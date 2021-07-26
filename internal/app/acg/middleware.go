@@ -47,7 +47,7 @@ func (s *Server) authMiddleware(next http.Handler) http.Handler {
 				Expires:  newExpTime,
 				HttpOnly: true,
 				Path:     "/",
-				Domain:   "acg-nikolaev.local", // Maybe extract to config?
+				Domain:   s.config.AppDomain,
 			})
 		}
 

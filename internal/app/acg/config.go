@@ -2,6 +2,8 @@ package acg
 
 // Config for ACG app
 type Config struct {
+	AppDomain   string `json:"app_domain"`
+	AppPort     string `json:"app_port"`
 	BindAddr    string `json:"bind_addr"`
 	DatabaseURL string `json:"db_url"`
 	LogDebug    bool   `json:"log_debug"`

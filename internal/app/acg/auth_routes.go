@@ -51,7 +51,7 @@ func (s *Server) handleAuthLogin() http.HandlerFunc {
 			Expires:  expTime,
 			HttpOnly: true,
 			Path:     "/",
-			Domain:   "acg-nikolaev.local",
+			Domain:   s.config.AppDomain,
 		})
 
 		s.respond(w, r, http.StatusOK, map[string]string{
@@ -68,7 +68,7 @@ func (s *Server) handleAuthLogout() http.HandlerFunc {
 			Expires:  time.Unix(0, 0),
 			HttpOnly: true,
 			Path:     "/",
-			Domain:   "acg-nikolaev.local",
+			Domain:   s.config.AppDomain,
 		})
 
 		s.respond(w, r, http.StatusOK, map[string]string{
