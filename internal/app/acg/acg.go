@@ -27,9 +27,7 @@ func NewServer(config *Config) *Server {
 
 func (s *Server) configureRouter() {
 	// Pages Routes
-	s.router.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("home page"))
-	})
+	s.router.Get("/", s.handleHomepage())
 
 	s.router.Get("/about", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("about page"))
