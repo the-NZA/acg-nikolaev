@@ -110,6 +110,13 @@ func (s *Server) configureRouter() {
 			r.Get("/all", s.handleMaterialGetAll())
 		})
 
+		r.Route("/page", func(r chi.Router) {
+			r.Get("/", s.handlePageGetBySlug())
+			r.Post("/", s.handlePageCreate())
+			r.Delete("/", s.handlePageDelete())
+			r.Get("/all", s.handlePageGetAll())
+		})
+
 		r.Route("/user", func(r chi.Router) {
 			r.Post("/", s.handleUserCreate())
 			r.Delete("/", s.handleUserDelete())

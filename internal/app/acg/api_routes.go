@@ -609,6 +609,113 @@ func (s *Server) handleMatCategoryGetAll() http.HandlerFunc {
  */
 
 /*
+ * Page handlers
+ */
+func (s *Server) handlePageCreate() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		page := &models.Page{
+			ID: primitive.NewObjectID(),
+		}
+
+		var err error
+
+		if err = json.NewDecoder(r.Body).Decode(page); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		page.Slug = helpers.GenerateSlug(page.Title)
+		// page.URL = cat.URL() + "/" + page.Slug
+
+		// post.URL = fmt.Sprintf("/%s/%s", cat.Slug, helpers.GenerateSlug(post.Title))
+
+		if err = s.store.Pages().Create(page); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusCreated, fmt.Sprintf("Page (%s) successfully created", page.ID.Hex()))
+	}
+}
+
+func (s *Server) handlePageGetBySlug() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		slug := r.URL.Query().Get("slug")
+
+		if slug == "" {
+			s.logger.Logf("[ERROR] %v\n", helpers.ErrNoRequestParams)
+			s.error(w, r, http.StatusBadRequest, helpers.ErrNoRequestParams)
+			return
+		}
+
+		page, err := s.store.Pages().FindBySlug(slug)
+
+		switch err {
+		case mongo.ErrNoDocuments:
+			s.logger.Logf("[ERROR] %v\n", helpers.ErrNoPost)
+			s.error(w, r, http.StatusNotFound, helpers.ErrNoPage)
+			return
+		case nil:
+			s.respond(w, r, http.StatusOK, page)
+			return
+		default:
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+	}
+}
+
+func (s *Server) handlePageDelete() http.HandlerFunc {
+	type req struct {
+		ID primitive.ObjectID `json:"deletedID"`
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := &req{}
+		var err error
+
+		if err = json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		if req.ID.IsZero() {
+			s.logger.Logf("[ERROR] %v\n", helpers.ErrEmptyObjectID)
+			s.error(w, r, http.StatusInternalServerError, helpers.ErrEmptyObjectID)
+			return
+		}
+
+		if err = s.store.Pages().Delete(req.ID); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, fmt.Sprintf("Page (%s) successfully deleted", req.ID.Hex()))
+	}
+}
+
+func (s *Server) handlePageGetAll() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		pages, err := s.store.Pages().FindAll(bson.M{"deleted": false})
+		if err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, pages)
+	}
+}
+
+/*
+ * Page handlers END
+ */
+
+/*
  * User handlers
  */
 func (s *Server) handleUserCreate() http.HandlerFunc {
