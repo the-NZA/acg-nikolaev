@@ -27,23 +27,15 @@ func NewServer(config *Config) *Server {
 
 func (s *Server) configureRouter() {
 	// Pages Routes
-	s.router.Get("/", s.handleHomepage())
+	s.router.Get("/", s.handleHomePage())
 
-	s.router.Get("/about", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("about page"))
-	})
+	s.router.Get("/about", s.handleAboutPage())
 
-	s.router.Get("/materials", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("materials page"))
-	})
+	s.router.Get("/materials", s.handleMaterialsPage())
 
-	s.router.Get("/services", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("services page"))
-	})
+	s.router.Get("/services", s.handleServicesPage())
 
-	s.router.Get("/contacts", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("contacts page"))
-	})
+	s.router.Get("/contacts", s.handleContactsPage())
 
 	s.router.Route("/posts", func(r chi.Router) {
 		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
