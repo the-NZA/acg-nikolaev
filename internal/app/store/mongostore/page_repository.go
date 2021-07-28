@@ -26,7 +26,7 @@ func (p PageRepository) Create(page *models.Page) error {
 		return err
 	}
 
-	fpage, _ := p.FindBySlug(page.Slug)
+	fpage, _ := p.FindByURL(page.URL)
 	if fpage != nil {
 		return helpers.ErrPageAlreadyExist
 	}

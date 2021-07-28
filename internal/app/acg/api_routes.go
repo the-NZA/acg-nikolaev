@@ -625,10 +625,7 @@ func (s *Server) handlePageCreate() http.HandlerFunc {
 			return
 		}
 
-		page.Slug = helpers.GenerateSlug(page.Title)
-		// page.URL = cat.URL() + "/" + page.Slug
-
-		// post.URL = fmt.Sprintf("/%s/%s", cat.Slug, helpers.GenerateSlug(post.Title))
+		page.URL = "/" + helpers.GenerateSlug(page.Title)
 
 		if err = s.store.Pages().Create(page); err != nil {
 			s.logger.Logf("[ERROR] %v\n", err)
@@ -700,7 +697,7 @@ func (s *Server) handlePageDelete() http.HandlerFunc {
 
 func (s *Server) handlePageGetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		pages, err := s.store.Pages().FindAll(bson.M{"deleted": false})
+		pages, err := s.store.Pages().FindAll(bson.M{})
 		if err != nil {
 			s.logger.Logf("[ERROR] %v\n", err)
 			s.error(w, r, http.StatusInternalServerError, err)

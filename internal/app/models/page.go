@@ -12,7 +12,7 @@ type Page struct {
 	Title    string             `bson:"title,omitempty" json:"title,omitempty"`
 	Subtitle string             `bson:"subtitle,omitempty" json:"subtitle,omitempty"`
 	MetaDesc string             `bson:"desc,omitempty" json:"desc,omitempty"`
-	Slug     string             `bson:"slug,omitempty" json:"slug,omitempty"`
+	URL      string             `bson:"url,omitempty" json:"url,omitempty"`
 	PageData []Block            `bson:"pagedata,omitempty" json:"pagedata,omitempty"`
 }
 
@@ -20,10 +20,10 @@ type Page struct {
 func (p Page) Validate() error {
 	return validation.ValidateStruct(&p,
 		validation.Field(&p.ID, validation.Required, validation.By(helpers.CheckObjectID)),
-		validation.Field(&p.Title, validation.Required, validation.RuneLength(5, 50)),
+		validation.Field(&p.Title, validation.Required, validation.RuneLength(5, 55)),
 		validation.Field(&p.Subtitle, validation.Required, validation.RuneLength(30, 255)),
 		validation.Field(&p.MetaDesc, validation.Required, validation.RuneLength(50, 255)),
-		validation.Field(&p.Slug, validation.Required),
+		validation.Field(&p.URL, validation.Required, validation.RuneLength(5, 255)),
 		validation.Field(&p.PageData, validation.NilOrNotEmpty),
 	)
 }
