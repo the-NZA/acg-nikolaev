@@ -8,6 +8,7 @@ import (
 	"github.com/the-NZA/acg-nikolaev/internal/app/helpers"
 )
 
+// handleAuthRoot just a placeholder
 func (s *Server) handleAuthRoot() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		s.respond(w, r, http.StatusOK, map[string]string{
@@ -17,6 +18,7 @@ func (s *Server) handleAuthRoot() http.HandlerFunc {
 	}
 }
 
+// handleAuthLogin read username and password from Body and try to authorize user
 func (s *Server) handleAuthLogin() http.HandlerFunc {
 	type req struct {
 		Username string `json:"username"`
@@ -27,13 +29,13 @@ func (s *Server) handleAuthLogin() http.HandlerFunc {
 		var err error
 
 		if err = json.NewDecoder(r.Body).Decode(cred); err != nil {
-			s.logger.Logf("[ERROR] %v\n", err)
+			s.logger.Logf("[ERROR] During decode body: %v\n", err)
 			s.error(w, r, http.StatusInternalServerError, err)
 			return
 		}
 
 		if cred.Username == "" || cred.Password == "" {
-			// s.logger.Logf("[ERROR] %v\n", http.StatusBadRequest)
+			s.logger.Logf("[ERROR] Empty credentials in body: %v\n", helpers.ErrNoBodyParams)
 			s.error(w, r, http.StatusBadRequest, helpers.ErrNoBodyParams)
 			return
 		}
@@ -55,12 +57,14 @@ func (s *Server) handleAuthLogin() http.HandlerFunc {
 		})
 
 		s.respond(w, r, http.StatusOK, map[string]string{
-			"user":  cred.Username,
-			"token": token,
+			"login": "successful",
+			// "user":  cred.Username,
+			// "token": token,
 		})
 	}
 }
 
+// handleAuthLogout remove cookie with token
 func (s *Server) handleAuthLogout() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		http.SetCookie(w, &http.Cookie{

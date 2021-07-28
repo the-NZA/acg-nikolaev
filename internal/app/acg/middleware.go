@@ -7,6 +7,7 @@ import (
 	"github.com/the-NZA/acg-nikolaev/internal/app/helpers"
 )
 
+// authMiddleware check and varify cookie with token
 func (s *Server) authMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token, err := r.Cookie("TKN")
@@ -32,7 +33,7 @@ func (s *Server) authMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		s.logger.Logf("[INFO] isTokUpdate: %v\n", isTokUpdate)
+		// s.logger.Logf("[INFO] isTokUpdate: %v\n", isTokUpdate)
 		if isTokUpdate {
 			newToken, newExpTime, err := auth.UpdateToken(token.Value, s.config.SecretKey)
 			if err != nil {
