@@ -8,5 +8,5 @@ type Storer interface {
 	MatCategories() IMatCategoryRepository
 	Users() IUserRepository
 	Services() IServiceRepository
-	// Pages()
+	Pages() IPageRepository
 }

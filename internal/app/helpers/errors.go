@@ -10,10 +10,12 @@ var (
 	ErrNoCategory    = errors.New("Category does not exist yet")
 	ErrNoMatCategory = errors.New("Material category does not exist yet")
 	ErrNoPost        = errors.New("Post does not exist yet")
+	ErrNoPage        = errors.New("Page does not exist yet")
 	ErrNoMaterial    = errors.New("Material does not exist yet")
 	ErrNoService     = errors.New("Service does not exist yet")
 
 	ErrPostAlreadyExist        = errors.New("Post already exist")
+	ErrPageAlreadyExist        = errors.New("Page already exist")
 	ErrUserAlreadyExist        = errors.New("User already exist")
 	ErrEmailAlreadyExist       = errors.New("Email already taken")
 	ErrMaterialAlreadyExist    = errors.New("Material already exist")

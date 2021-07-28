@@ -20,6 +20,7 @@ type MongoStore struct {
 	materialsRepository *MaterialRepository
 	matCatRepository    *MatCatRepository
 	userRepository      *UserRepository
+	pageRepository      *PageRepository
 	serviceRepository   *ServiceRepository
 }
 
@@ -130,4 +131,17 @@ func (s *MongoStore) Services() store.IServiceRepository {
 	}
 
 	return s.serviceRepository
+}
+
+func (s *MongoStore) Pages() store.IPageRepository {
+	if s.pageRepository != nil {
+		return s.pageRepository
+	}
+
+	s.pageRepository = &PageRepository{
+		store:          s,
+		collectionName: "pages",
+	}
+
+	return s.pageRepository
 }

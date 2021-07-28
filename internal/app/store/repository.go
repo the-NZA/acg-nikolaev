@@ -60,3 +60,11 @@ type IServiceRepository interface {
 	Delete(primitive.ObjectID) error
 	FindAll(filter bson.M) ([]*models.Service, error)
 }
+
+// IPageRepository defines interface for page repository
+type IPageRepository interface {
+	Create(*models.Page) error
+	FindBySlug(string) (*models.Page, error)
+	Delete(primitive.ObjectID) error
+	FindAll(filter bson.M) ([]*models.Page, error)
+}
