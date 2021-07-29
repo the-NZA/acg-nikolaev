@@ -1,0 +1,36 @@
+{{define "header_singlepost"}}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<script>let a = 4;</script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="/static/main.css">
+	<title>{{.Title}}</title>
+	<meta name="description" content="{{.MetaDesc}}">
+</head>
+<body class="site_body">
+	<header class="header">
+		<div class="header__container">
+			<div class="header__logo">
+				<a href="/">
+					<img class="header__logoimg" src="/static/img/logo.jpg" alt="AKG Nikolaev">
+				</a>
+			</div>
+			<nav class="header__nav">
+				<ul class="menu">
+					<li class='menu__li '><a href="/">Главная</a></li>
+					<li class='menu__li '><a href="/services">Услуги</a></li>
+					<li class='menu__li '><a href="/about">О компании</a></li>
+					<li class='menu__li '><a href="/contacts">Контакты</a></li>
+					<li class='menu__li '><a href="/posts">Новости</a></li>
+					<li class='menu__li '><a href="/materials">Материалы</a></li>
+				</ul>
+			</nav>
+			<button class="header__mobtoggler ">
+				<span class="mobtoggler"></span>
+			</button>
+		</div>
+	</header>
+{{end}}

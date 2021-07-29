@@ -1,0 +1,150 @@
+{{template "header" .Page}}
+	<div class="materials">
+		{{template "page_title" .Page}}
+
+		<div class="materials__container">
+	
+			<aside class="materials__aside">
+				<div class="materials__widget widget">
+					<h3 class="widget__title">
+						Категории
+					</h3>
+					<div class="widget__content">
+						<ul class="widget__categories">
+						{{range .MatCats}}
+							{{ if .Materials }}
+								<li><a data-slug="{{.Slug}}">{{.Title}}</a></li>
+							{{end}}
+						{{end}}
+							<!-- <li><a href="#" class="active">Аудит</a></li> -->
+							<!-- <li><a href="#">Бухгалтерия</a></li> -->
+							<!-- <li><a href="#">Налоги</a></li> -->
+						</ul>
+					</div>
+				</div>
+			</aside>
+	
+			<main class="materials__main">
+			{{range .MatCats}}
+
+				{{ if .Materials }}
+					<section class="materials__category mcat" data-section={{.Slug}}>
+						<div class="mcat__header">
+							<h3 class="mcat__title">{{.Title}}</h3>
+							<p class="mcat__desc">{{.Desc}}</p>
+						</div>
+		
+						<div class="mcat__container">
+						{{range .Materials}}
+							<div class="mcard">
+								<div class="mcard__header">
+									<h4 class="mcard__title">{{.Title}}</h4>
+									<span class="mcard__date">{{.TimeString}}</span>
+									<button class="mcard__toggle"></button>
+								</div>
+		
+								<div class="mcard__body">
+									<p>{{.Desc}}</p>
+		
+									<a href="{{.FileLink}}" download class="mcard__download download_link">Скачать</a>
+								</div>
+							</div>
+						{{end}}
+						</div>
+		
+						<button class="mcat__showall" data-slug="{{.Slug}}">Показать все</button>
+					</section>
+				{{end}}
+			{{end}}
+			</main>
+		</div>
+
+		<div id="modal_app"></div>
+	</div>
+{{template "footer"}}
+				<!-- <section class="materials__category mcat"> -->
+				<!-- 	<div class="mcat__header"> -->
+				<!-- 		<h3 class="mcat__title">Бухгалтерия</h3> -->
+				<!-- 		<p class="mcat__desc">Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto quidem illo -->
+				<!-- 			vitae veniam quos saepe libero voluptatibus voluptatum recusandae as.</p> -->
+				<!-- 	</div> -->
+	
+				<!-- 	<div class="mcat__container"> -->
+				<!-- 		<div class="mcard"> -->
+				<!-- 			<div class="mcard__header"> -->
+				<!-- 				<h4 class="mcard__title">Lorem ipsum dolor sit amet consectetur</h4> -->
+				<!-- 				<span class="mcard__date">02.11.2020</span> -->
+				<!-- 				<button class="mcard__toggle"></button> -->
+				<!-- 			</div> -->
+	
+				<!-- 			<div class="mcard__body"> -->
+				<!-- 				<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur dolor non, et, amet -->
+				<!-- 					dolorem, sequi accusantium sunt libero blanditiis quisquam harum doloremque itaque -->
+				<!-- 					similique exercitationem nesciunt fuga! Impedit, debitis iste!Impedit, debitis -->
+				<!-- 					iste!Impedit, debitis iste!</p> -->
+	
+				<!-- 				<a href="#" class="mcard__download download_link">Скачать</a> -->
+	
+				<!-- 			</div> -->
+				<!-- 		</div> -->
+				<!-- 		<div class="mcard"> -->
+				<!-- 			<div class="mcard__header"> -->
+				<!-- 				<h4 class="mcard__title">Lorem ipsum dolor sit amet consectetur</h4> -->
+				<!-- 				<span class="mcard__date">02.11.2020</span> -->
+				<!-- 				<button class="mcard__toggle"></button> -->
+				<!-- 			</div> -->
+	
+				<!-- 			<div class="mcard__body "> -->
+				<!-- 				<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur dolor non, et, amet -->
+				<!-- 					dolorem, sequi accusantium sunt libero blanditiis quisquam harum doloremque itaque -->
+				<!-- 					similique exercitationem nesciunt fuga! Impedit, debitis iste!</p> -->
+	
+				<!-- 				<a href="#" class="mcard__download download_link">Скачать</a> -->
+				<!-- 			</div> -->
+				<!-- 		</div> -->
+				<!-- 	</div> -->
+	
+				<!-- 	<button class="mcat__showall" data-slug="buhgalteria">Показать все</button> -->
+				<!-- </section> -->
+				<!-- <section class="materials__category mcat"> -->
+				<!-- 	<div class="mcat__header"> -->
+				<!-- 		<h3 class="mcat__title">Налоги</h3> -->
+				<!-- 		<p class="mcat__desc">Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto quidem illo -->
+				<!-- 			vitae veniam quos saepe libero voluptatibus voluptatum recusandae as.</p> -->
+				<!-- 	</div> -->
+	
+				<!-- 	<div class="mcat__container"> -->
+				<!-- 		<div class="mcard"> -->
+				<!-- 			<div class="mcard__header"> -->
+				<!-- 				<h4 class="mcard__title">Lorem ipsum dolor sit amet consectetur</h4> -->
+				<!-- 				<span class="mcard__date">02.11.2020</span> -->
+				<!-- 				<button class="mcard__toggle"></button> -->
+				<!-- 			</div> -->
+	
+				<!-- 			<div class="mcard__body"> -->
+				<!-- 				<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur dolor non, et, amet -->
+				<!-- 					dolorem, sequi accusantium sunt libero blanditiis quisquam harum doloremque itaque -->
+				<!-- 					similique exercitationem nesciunt fuga! Impedit, debitis iste!</p> -->
+	
+				<!-- 				<a href="#" class="mcard__download download_link">Скачать</a> -->
+				<!-- 			</div> -->
+				<!-- 		</div> -->
+				<!-- 		<div class="mcard"> -->
+				<!-- 			<div class="mcard__header"> -->
+				<!-- 				<h4 class="mcard__title">Lorem ipsum dolor sit amet consectetur</h4> -->
+				<!-- 				<span class="mcard__date">02.11.2020</span> -->
+				<!-- 				<button class="mcard__toggle"></button> -->
+				<!-- 			</div> -->
+	
+				<!-- 			<div class="mcard__body "> -->
+				<!-- 				<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur dolor non, et, amet -->
+				<!-- 					dolorem, sequi accusantium sunt libero blanditiis quisquam harum doloremque itaque -->
+				<!-- 					similique exercitationem nesciunt fuga! Impedit, debitis iste!</p> -->
+	
+				<!-- 				<a href="#" class="mcard__download download_link">Скачать</a> -->
+				<!-- 			</div> -->
+				<!-- 		</div> -->
+				<!-- 	</div> -->
+	
+				<!-- 	<button class="mcat__showall" data-slug="nalogi">Показать все</button> -->
+				<!-- </section> -->

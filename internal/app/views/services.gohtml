@@ -1,0 +1,40 @@
+{{template "header" .Page}}
+<main class="services__main">
+	{{template "page_title" .Page}}
+
+	<section class="services">
+		<div class="services__cards">
+		{{ range .Services}}
+			<div class="service_card">
+				<div class="service_card__img">
+					<img src="{{.Img.URL}}" alt="{{.Img.Alt}}">
+				</div>
+				<h3 class="service_card__title">{{.Title}}</h3>
+				<div class="service_card__description">{{.Desc}}</div>
+			</div>
+		{{end}}
+		</div>
+	</section>
+</main>
+{{template "footer"}}
+
+<!--
+SAMPLE SERVICE CARD
+<div class="service_card">
+	<div class="service_card__img">
+		<img src="img/technical-support.svg" alt="service icon">
+	</div>
+	<h3 class="service_card__title">
+		Lorem ipsum dolor sit amet.
+	</h3>
+	<div class="service_card__description">
+		Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eos, inventore tempore rerum similique
+		mollitia repellat debitis nemo doloribus, quaerat natus esse maxime sed officia autem laborum,
+		voluptatem dolorem. Porro exercitationem ipsa modi. Corporis mollitia incidunt minus, vel assumenda
+		sint maxime nostrum hic tenetur eos ad sed, ipsum quidem temporibus adipisci aspernatur fugiat alias
+		sit accusantium modi? Excepturi laborum natus similique enim odit nobis perferendis, eius officia,
+		modi quaerat obcaecati atque magni quis id a quod laudantium facilis perspiciatis esse nam
+		consectetur omnis! Suscipit excepturi officia distinctio repellendus, accusantium, assumenda odit
+		corrupti.
+	</div>
+</div> -->

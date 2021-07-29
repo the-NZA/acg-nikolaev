@@ -1,0 +1,98 @@
+{{template "header_posts" .}}
+
+<div class="posts">
+	{{template "page_title" .Page}}
+
+	<div class="posts__container">
+
+		<aside class="posts__aside">
+			<div class="posts__widget widget">
+				<h3 class="widget__title">
+					Категории
+				</h3>
+				<div class="widget__content">
+					<ul>
+					{{$slug := .Page.Slug}}
+					{{range .Categories}}
+						<li><a href="{{.URL}}" class="{{if eq $slug .URL}}active{{end}}">{{.Title}}</a></li>
+					{{end}}
+					</ul>
+				</div>
+			</div>
+		</aside>
+
+		<main class="posts__main">
+			<div class="posts__cards">
+				{{ range .Posts }}
+				<div class="post_card">
+					<div class="post_card__image">
+						{{if .PostImg}}
+							<img src="{{.PostImg}}" alt="{{.Title}}">
+						{{end}}
+					</div>
+					<div class="post_card__content">
+						<h4 class="post_card__title">
+							{{.Title}}
+						</h4>
+						<p class="post_card__text">
+							{{.Excerpt}}
+						</p>
+						<div class="post_card__footer">
+							<a href="{{.URL}}" class="post_card__btn">Читать</a>
+							<p class="post_card__date">{{.TimeString}}</p>
+						</div>
+					</div>
+				</div>
+				{{end}}
+			</div>
+			{{if gt .PagesCnt 1}}
+				{{template "pagination" .}}
+			{{end}}
+		</main>
+	</div>
+</div>
+
+{{template "footer"}}
+
+<!-- Example of post_card -->
+<!-- <div class="post_card"> -->
+<!-- 	<div class="post_card__image"> -->
+<!-- 	</div> -->
+<!-- 	<div class="post_card__content"> -->
+<!-- 		<h4 class="post_card__title"> -->
+<!-- 			Post number 1 -->
+<!-- 		</h4> -->
+<!-- 		<p class="post_card__text"> -->
+<!-- 			Lorem, ipsum dolor sit amet consectetur adipisicing elit. Aliquid voluptatibus ipsum soluta -->
+<!-- 			at, repellendus -->
+<!-- 			et assumenda pariatur nulla autem eum magni sint consequatur libero non, consequuntur eius -->
+<!-- 			iste, modi -->
+<!-- 			laudantium! -->
+<!-- 		</p> -->
+<!-- 		<div class="post_card__footer"> -->
+<!-- 			<a href="/singlepost.html" class="post_card__btn">Читать</a> -->
+<!-- 			<p class="post_card__date">22.10.2020</p> -->
+<!-- 		</div> -->
+<!-- 	</div> -->
+<!-- </div> -->
+
+<!-- Example of pagination -->
+<!-- <div class="pagination"> -->
+<!-- 	<div class="pagination__container"> -->
+<!-- 		<ul class="pagination__list"> -->
+<!-- 			<li class="pagination__link pagination__link--prev"> -->
+<!-- 				<a href="#">&larr;</a> -->
+<!-- 			</li> -->
+
+<!-- 			<li class="pagination__link pagination__link--active"> -->
+<!-- 				<a href="#">1</a> -->
+<!-- 			</li> -->
+<!-- 			<li class="pagination__link"> -->
+<!-- 				<a href="#">2</a> -->
+<!-- 			</li> -->
+<!-- 			<li class="pagination__link pagination__link--next"> -->
+<!-- 				<a href="#">&rarr;</a> -->
+<!-- 			</li> -->
+<!-- 		</ul> -->
+<!-- 	</div> -->
+<!-- </div> -->

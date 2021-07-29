@@ -1,0 +1,49 @@
+{{template "header_singlepost" .}}
+
+<main class="singlepost__main">
+	<div class="singlepost__headerimg" style="background-image: url({{.PostImg}});"></div>
+	<!-- <div class="singlepost__headerimg" style="background-image: url(/static/img/singlepost.jpg);"></div> -->
+
+	<div class="singlepost__title">
+		<h1 class=" pages__header singlepost__header">{{.Title}}</h1>
+
+		<div class="singlepost__subheader">
+			<div class="singlepost__info">
+				<div class="singlepost__category"><a href="{{.CategoryURL}}">{{.Category}}</a></div>
+				<div class="singlepost__date">{{.TimeString}}</div>
+			</div>
+
+			<div class="singlepost__share">
+				<ul class="share__links">
+					<li class="share__link share__link--scaledtg"><a href="#"><img src="/static/img/tg.svg" alt="Telegram"></a></li>
+					<li class="share__link share__link--scaledvk"><a href="#"><img src="/static/img/vk.svg" alt="VK"></a></li>
+					<li class="share__link"><a href="#"><img src="/static/img/fb.svg" alt="Facebook"></a></li>
+					<li class="share__link"><a href="#"><img src="/static/img/inst.svg" alt="Instagram"></a></li>
+				</ul>
+			</div>
+		</div>
+	</div> 
+
+	<article class="singlepost__content">
+	{{ $blocks := .PageData }}
+	{{ if $blocks }}
+		{{range $block := $blocks}}
+			{{ if eq $block.Type "paragraph" }}
+				<p class="singlepost__text">
+					{{ $block.Data.Text }}
+				</p>
+			{{ else if eq $block.Type "image"}}
+				<img src="{{ $block.Data.File.URL }}" alt="Проблема с загрузкой изображения" class="singlepage__img">
+			{{ end }}
+		{{end}}
+	{{else}}
+		<p class="singlepost__text">Материал обновляется, возвращайтесь немного позже.</p>
+	{{end}}
+	</article>
+</main>
+
+{{template "footer"}}
+
+<!-- EXAMPLE OF PARAGRAPH FOR POST -->
+<!-- <p class="singlepost__text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus iste iusto delectus quis consequatur dolores -->
+<!-- suscipit perspiciatis voluptatem culpa maxime.Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus iste iusto delectus quis consequatur dolores suscipit perspiciatis voluptatem culpa maxime.</p> -->

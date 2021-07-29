@@ -1,0 +1,122 @@
+{{template "header" .Page}}
+	<main class="home__main">
+		<section class="home_hero">
+			<div class="home_hero__container">
+				<div class="home_hero__content">
+					<p class="hero_content__preheader">Welcome to our company</p>
+					<h1 class="hero_content__header">we guarantee you the best service</h1>
+					<p class="hero_content__text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet consectetur.</p>
+					
+					<a href="/about" class="hero_content__btn">О компании</a>
+					<a href="/services" class="hero_content__btn hero_content__btn-dif">Наши услуги</a>
+				</div>
+
+				<div class="home_hero__icon">
+					<a id="heroScrollBtn">
+						<img src="/static/img/hero_down.svg" alt="V">
+					</a>
+				</div>
+			</div>
+		</section>
+		
+		<section class="new_posts">
+			<div class="new_posts__info">
+				<h2 class="home__header new_posts__header">
+					Новые публикации
+				</h2>
+				<p class="home__descr new_posts__description">
+					Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quas non recusandae atque corrupti magnam, itaque perspiciatis beatae fuga pariatur voluptates.
+				</p>
+				<a class="new_posts__link" href="/posts">Все публикации &rarr;</a>
+			</div>
+			<div class="new_posts__container">
+			{{range .Posts}}
+				<div class="post_card post_card--home">
+					<div class="post_card__image">
+						{{if .PostImg}}
+							<img src="{{.PostImg}}" alt="{{.Title}}">
+						{{end}}
+					</div>
+					<div class="post_card__content">
+						<h4 class="post_card__title">
+							{{.Title}}
+						</h4>
+						<p class="post_card__text">
+							{{.Excerpt}}
+						</p>
+						<div class="post_card__footer">
+							<a href="{{.URL}}" class="post_card__btn">Читать</a>
+							<p class="post_card__date">{{.TimeString}}</p>
+						</div>
+					</div>
+				</div>
+			{{end}}
+			</div>
+		</section>
+
+		<section class="homeservices">
+			<div class="homeservices__info">
+				<h2 class="home__header services__header--home">
+					Услуги и возможности
+				</h2>
+				<p class="home__descr services__description">
+					Полный спектр аудиторских услуг для вашего бизнеса.
+				</p>
+			</div>
+			<div class="homeservices__cards">
+			{{range .Services}}
+				<div class="homeservices_card">
+					<div class="homeservices_card__img">
+						<a href="/services">
+							<img class="homeservices_card__icon" src="{{.Img.URL}}" alt="{{.Img.Alt}}">
+						</a>
+					</div>
+					<h3 class="homeservices_card__title">
+						<a href="/services">{{.Title}}</a>
+					</h3>
+					<div class="homeservices_card__description">
+						{{.Subtitle}}
+						<!-- <span class="homeservices_card__icon"></span> -->
+					</div>
+				</div>
+			{{end}}
+			</div>
+		</section>
+	</main>
+{{template "footer"}}
+
+
+<!--
+EXAMPLE OF SERVICE CARD
+<div class="homeservices_card">
+	<div class="homeservices_card__img">
+		<a href="#">
+			<img class="homeservices_card__icon" src="img/servicon.svg" alt="homeservice icon">
+		</a>
+	</div>
+	<h3 class="homeservices_card__title">
+		<a href="#">Lorem ipsum dolor sit amet.</a>
+	</h3>
+	<div class="homeservices_card__description">
+		Lorem ipsum dolor sit amet, consectetur adipisicing elit. Lorem, ipsum dolor. Lorem ipsum dolor .
+		<span class="homeservices_card__icon"></span>
+	</div>
+</div> -->
+<!--
+EXAMPLE OF HOME POST CARD
+<div class="post_card post_card--home">
+	<div class="post_card__image">
+	</div>
+	<div class="post_card__content">
+		<h4 class="post_card__title">
+			Post number 1
+		</h4>
+		<p class="post_card__text">
+			Lorem, ipsum dolor sit amet consectetur adipisicing elit. Aliquid voluptatibus ipsum soluta at, repellendus et assumenda pariatur nulla autem eum magni sint consequatur libero non, consequuntur eius iste, modi laudantium!
+		</p>
+		<div class="post_card__footer">
+			<a href="/singlepost.html" class="post_card__btn">Читать</a>
+			<p class="post_card__date">22.10.2020</p>
+		</div>
+	</div>
+</div> --> 

@@ -1,0 +1,27 @@
+{{template "header" .}}
+<main class="singlepage__main about__main">
+	{{template "page_title" .}}
+
+	<section class="singlepage__content about__content">
+		{{ $blocks := .PageData }}
+		{{range $block := $blocks}}
+			{{ if eq $block.Type "paragraph" }}
+				<p class="singlepage__text">
+					{{ $block.Data.Text }}
+				</p>
+			{{ else if eq $block.Type "image"}}
+				<img src="{{ $block.Data.File.URL }}" alt="Photo Must be there" class="singlepage__img">
+			{{ end }}
+		{{end}}
+	</section>
+</main>
+{{template "footer"}}
+<!--
+EXAMPLE OF PARAGRAPH and IMG
+<p class="singlepage__text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil impedit quod vero
+facilis eum cumque accusamus, asperiores quos magnam optio fugiat distinctio delectus necessitatibus nulla, minima ab modi eos maiores voluptatibus odit odio expedita hic quidem deserunt? Id perferendis laboriosam,
+fuga consequatur sit ad soluta  </p>
+
+<img class="singlepage__img" src="https://via.placeholder.com/600x350" alt="Some image">
+<img class="singlepage__img" src="https://via.placeholder.com/800x450" alt="Some image">
+-->

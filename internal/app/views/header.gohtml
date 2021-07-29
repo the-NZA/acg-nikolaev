@@ -1,0 +1,36 @@
+{{define "header"}}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="/static/main.css">
+	<title>{{.Title}}</title>
+	<meta name="description" content="{{.MetaDesc}}">
+</head>
+<body class="site_body">
+	<header class="header">
+		<div class="header__container">
+			<div class="header__logo">
+				<a href="/">
+					<img class="header__logoimg" src="/static/img/logo.jpg" alt="AKG Nikolaev">
+				</a>
+			</div>
+			<nav class="header__nav">
+				<ul class="menu">
+					<!-- <li class="menu__li menu__li-active"><a href="/">Главная</a></li> -->
+					<li class='menu__li {{ if eq .Slug "/" }}menu__li-active{{end}}'><a href="/">Главная</a></li>
+					<li class='menu__li {{ if eq .Slug "/services" }}menu__li-active{{end}}'><a href="/services">Услуги</a></li>
+					<li class='menu__li {{ if eq .Slug "/about" }}menu__li-active{{end}}'><a href="/about">О компании</a></li>
+					<li class='menu__li {{ if eq .Slug "/contacts" }}menu__li-active{{end}}'><a href="/contacts">Контакты</a></li>
+					<li class='menu__li {{ if eq .Slug "/posts" }}menu__li-active{{end}}'><a href="/posts">Новости</a></li>
+					<li class='menu__li {{ if eq .Slug "/materials" }}menu__li-active{{end}}'><a href="/materials">Материалы</a></li>
+				</ul>
+			</nav>
+			<button class="header__mobtoggler ">
+				<span class="mobtoggler"></span>
+			</button>
+		</div>
+	</header>
+{{end}}
