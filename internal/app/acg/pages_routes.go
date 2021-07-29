@@ -78,9 +78,34 @@ func (s *Server) handleMaterialsPage() http.HandlerFunc {
 }
 
 func (s *Server) handleServicesPage() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		s.respond(w, r, http.StatusOK, "This is services page")
+	type servicepage struct {
+		Page     *models.Page
+		Services []*models.Service
 	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		page, err := s.store.Pages().FindByURL(r.URL.Path)
+		if err != nil {
+			s.logger.Logf("[DEBUG] page: %v\n", err)
+			http.Redirect(w, r, "/404", http.StatusNotFound)
+		}
+
+		services, err := s.store.Services().FindAll(bson.M{"deleted": false})
+		if err != nil {
+			s.logger.Logf("[DEBUG] services: %v\n", err)
+			http.Redirect(w, r, "/404", http.StatusNotFound)
+		}
+
+		tmpl.ExecuteTemplate(w, "services.gohtml", &servicepage{
+			Page:     page,
+			Services: services,
+		})
+	}
+
+	// return func(w http.ResponseWriter, r *http.Request) {
+
+	// 	s.respond(w, r, http.StatusOK, "This is services page")
+	// }
 }
 
 func (s *Server) handleContactsPage() http.HandlerFunc {
