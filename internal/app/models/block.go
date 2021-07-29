@@ -17,6 +17,6 @@ type BlockData struct {
 // FileInfo represents basic file structure for editors "file" field
 type FileInfo struct {
 	URL    string `bson:"url,omitempty" json:"url,omitempty"`
-	Width  int    `bson:"width,omitempty" json:"width,omitempty"`
-	Height int    `bson:"height,omitempty" json:"height,omitempty"`
+	Width  int32  `bson:"width,omitempty" json:"width,omitempty"`
+	Height int32  `bson:"height,omitempty" json:"height,omitempty"`
 }
