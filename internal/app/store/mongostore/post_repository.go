@@ -94,6 +94,30 @@ func (p PostRepository) FindAll(filter bson.M) ([]*models.Post, error) {
 	return posts, nil
 }
 
+// Find return all posts with passed filter and find options
+// This method is real projection to db find method
+func (p PostRepository) Find(filter bson.M, opts ...*options.FindOptions) ([]*models.Post, error) {
+	var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	db := p.store.db.Database(dbName)
+	col := db.Collection(p.collectionName)
+
+	res, err := col.Find(ctx, filter, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	posts := make([]*models.Post, 0)
+
+	err = res.All(ctx, &posts)
+	if err != nil {
+		return nil, err
+	}
+
+	return posts, nil
+}
+
 func (p PostRepository) updateOne(filter bson.M, update bson.M, opts ...*options.UpdateOptions) error {
 	var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()

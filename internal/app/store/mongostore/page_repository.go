@@ -63,12 +63,12 @@ func (p *PageRepository) findOne(filter bson.M, opts ...*options.FindOneOptions)
 
 // FindBySlug lookup page by it slug
 func (p PageRepository) FindBySlug(slug string) (*models.Page, error) {
-	return p.findOne(bson.M{"slug": slug, "deleted": false})
+	return p.findOne(bson.M{"slug": slug})
 }
 
 // FindByURL return all pages by it URL
 func (p PageRepository) FindByURL(URL string) (*models.Page, error) {
-	return p.findOne(bson.M{"url": URL, "deleted": false})
+	return p.findOne(bson.M{"url": URL})
 }
 
 // FindAll return all pages with specified filter

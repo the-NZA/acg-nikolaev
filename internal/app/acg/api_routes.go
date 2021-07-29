@@ -637,21 +637,21 @@ func (s *Server) handlePageCreate() http.HandlerFunc {
 	}
 }
 
-func (s *Server) handlePageGetBySlug() http.HandlerFunc {
+func (s *Server) handlePageGetByURL() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		slug := r.URL.Query().Get("slug")
+		url := r.URL.Query().Get("url")
 
-		if slug == "" {
+		if url == "" {
 			s.logger.Logf("[ERROR] %v\n", helpers.ErrNoRequestParams)
 			s.error(w, r, http.StatusBadRequest, helpers.ErrNoRequestParams)
 			return
 		}
 
-		page, err := s.store.Pages().FindBySlug(slug)
+		page, err := s.store.Pages().FindByURL(url)
 
 		switch err {
 		case mongo.ErrNoDocuments:
-			s.logger.Logf("[ERROR] %v\n", helpers.ErrNoPost)
+			s.logger.Logf("[ERROR] %v\n", helpers.ErrNoPage)
 			s.error(w, r, http.StatusNotFound, helpers.ErrNoPage)
 			return
 		case nil:

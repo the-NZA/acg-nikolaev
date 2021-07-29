@@ -6,11 +6,13 @@ import (
 	"github.com/the-NZA/acg-nikolaev/internal/app/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // IPostRepository defines interface for post repository
 type IPostRepository interface {
 	Create(*models.Post) error
+	Find(bson.M, ...*options.FindOptions) ([]*models.Post, error)
 	FindBySlug(string) (*models.Post, error)
 	FindByURL(string) (*models.Post, error)
 	FindAll(bson.M) ([]*models.Post, error)
@@ -64,7 +66,7 @@ type IServiceRepository interface {
 // IPageRepository defines interface for page repository
 type IPageRepository interface {
 	Create(*models.Page) error
-	FindBySlug(string) (*models.Page, error)
+	FindByURL(string) (*models.Page, error)
 	Delete(primitive.ObjectID) error
 	FindAll(filter bson.M) ([]*models.Page, error)
 }

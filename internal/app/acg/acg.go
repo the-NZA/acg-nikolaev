@@ -111,7 +111,7 @@ func (s *Server) configureRouter() {
 		})
 
 		r.Route("/page", func(r chi.Router) {
-			r.Get("/", s.handlePageGetBySlug())
+			r.Get("/", s.handlePageGetByURL())
 			r.Post("/", s.handlePageCreate())
 			r.Delete("/", s.handlePageDelete())
 			r.Get("/all", s.handlePageGetAll())
