@@ -101,15 +101,16 @@ func (s *Server) handleServicesPage() http.HandlerFunc {
 			Services: services,
 		})
 	}
-
-	// return func(w http.ResponseWriter, r *http.Request) {
-
-	// 	s.respond(w, r, http.StatusOK, "This is services page")
-	// }
 }
 
 func (s *Server) handleContactsPage() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		s.respond(w, r, http.StatusOK, "This is contacts page")
+		contactspage, err := s.store.Pages().FindByURL(r.URL.Path)
+		if err != nil {
+			s.logger.Logf("[DEBUG] page: %v\n", err)
+			http.Redirect(w, r, "/404", http.StatusNotFound)
+		}
+
+		tmpl.ExecuteTemplate(w, "singlepage.gohtml", contactspage)
 	}
 }

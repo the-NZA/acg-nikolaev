@@ -665,6 +665,8 @@ func (s *Server) handlePageGetByURL() http.HandlerFunc {
 	}
 }
 
+// handlePageUpdate update page by it id
+// * NOTE: must receive whole page struct
 func (s *Server) handlePageUpdate() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var err error
@@ -688,7 +690,7 @@ func (s *Server) handlePageUpdate() http.HandlerFunc {
 			return
 		}
 
-		s.respond(w, r, http.StatusOK, "OK")
+		s.respond(w, r, http.StatusOK, fmt.Sprintf("Page (%v) successfully updated", page.ID.Hex()))
 	}
 }
 
