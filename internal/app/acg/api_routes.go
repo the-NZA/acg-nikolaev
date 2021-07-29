@@ -665,6 +665,33 @@ func (s *Server) handlePageGetByURL() http.HandlerFunc {
 	}
 }
 
+func (s *Server) handlePageUpdate() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var err error
+		page := &models.Page{}
+
+		if err = json.NewDecoder(r.Body).Decode(page); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		if err = page.Validate(); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		if err = s.store.Pages().Update(bson.M{"_id": page.ID}, bson.M{"$set": page}); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, "OK")
+	}
+}
+
 func (s *Server) handlePageDelete() http.HandlerFunc {
 	type req struct {
 		ID primitive.ObjectID `json:"deletedID"`

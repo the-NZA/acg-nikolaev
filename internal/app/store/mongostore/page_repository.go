@@ -109,6 +109,10 @@ func (p PageRepository) updateOne(filter bson.M, update bson.M, opts ...*options
 	return nil
 }
 
+func (p PageRepository) Update(filter bson.M, update bson.M, opts ...*options.UpdateOptions) error {
+	return p.updateOne(filter, update, opts...)
+}
+
 // Delete marks page as deleted
 func (p PageRepository) Delete(deletedID primitive.ObjectID) error {
 	return p.updateOne(bson.M{"_id": deletedID}, bson.M{"$set": bson.M{"deleted": true}})

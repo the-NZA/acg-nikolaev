@@ -114,6 +114,7 @@ func (s *Server) configureRouter() {
 			r.Get("/", s.handlePageGetByURL())
 			r.Post("/", s.handlePageCreate())
 			r.Delete("/", s.handlePageDelete())
+			r.Put("/", s.handlePageUpdate())
 			r.Get("/all", s.handlePageGetAll())
 		})
 
