@@ -28,8 +28,6 @@ func (s *Server) handleHomePage() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		// s.logger.Logf("[DEBUG] url path: %v\n", r.URL.Path)
-
 		page, err := s.store.Pages().FindByURL(r.URL.Path)
 		if err != nil {
 			s.logger.Logf("[DEBUG] page: %v\n", err)
@@ -53,10 +51,6 @@ func (s *Server) handleHomePage() http.HandlerFunc {
 			return
 		}
 
-		// for _, v := range posts {
-		// 	s.logger.Logf("[DEBUG] posts: %v\n", v)
-		// }
-
 		tmpl.ExecuteTemplate(w, "index.gohtml", &homepage{
 			Page:     page,
 			Services: services,
@@ -67,7 +61,13 @@ func (s *Server) handleHomePage() http.HandlerFunc {
 
 func (s *Server) handleAboutPage() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		s.respond(w, r, http.StatusOK, "This is about page")
+		aboutpage, err := s.store.Pages().FindByURL(r.URL.Path)
+		if err != nil {
+			s.logger.Logf("[DEBUG] page: %v\n", err)
+			http.Redirect(w, r, "/404", http.StatusNotFound)
+		}
+
+		tmpl.ExecuteTemplate(w, "singlepage.gohtml", aboutpage)
 	}
 }
 
