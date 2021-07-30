@@ -86,6 +86,7 @@ func (s *Server) configureRouter() {
 			r.Get("/", s.handlePostGetBySlug())
 			r.Post("/", s.handlePostCreate())
 			r.Delete("/", s.handlePostDelete())
+			r.Put("/", s.handlePostUpdate())
 			r.Get("/all", s.handlePostGetAll())
 		})
 

@@ -133,6 +133,14 @@ func (p PostRepository) updateOne(filter bson.M, update bson.M, opts ...*options
 	return nil
 }
 
+func (p PostRepository) Update(updatedPost *models.Post) error {
+	if err := updatedPost.Validate(); err != nil {
+		return err
+	}
+
+	return p.updateOne(bson.M{"_id": updatedPost.ID}, bson.M{"$set": updatedPost})
+}
+
 // Delete marks post as deleted
 func (p PostRepository) Delete(deletedID primitive.ObjectID) error {
 	return p.updateOne(bson.M{"_id": deletedID}, bson.M{"$set": bson.M{"deleted": true}})

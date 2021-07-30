@@ -16,6 +16,7 @@ type IPostRepository interface {
 	FindBySlug(string) (*models.Post, error)
 	FindByURL(string) (*models.Post, error)
 	FindAll(bson.M) ([]*models.Post, error)
+	Update(*models.Post) error
 	Delete(primitive.ObjectID) error
 }
 

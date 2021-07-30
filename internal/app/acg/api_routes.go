@@ -211,6 +211,36 @@ func (s *Server) handlePostGetBySlug() http.HandlerFunc {
 	}
 }
 
+// handlePostUpdate update post by it id
+// * NOTE: must receive whole post struct
+func (s *Server) handlePostUpdate() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var err error
+		post := &models.Post{}
+
+		if err = json.NewDecoder(r.Body).Decode(post); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		// if err = post.Validate(); err != nil {
+		// 	s.logger.Logf("[ERROR] %v\n", err)
+		// 	s.error(w, r, http.StatusBadRequest, err)
+		// 	return
+		// }
+
+		// if err = s.store.Posts().Update(bson.M{"_id": post.ID}, bson.M{"$set": post}); err != nil {
+
+		if err = s.store.Posts().Update(post); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, fmt.Sprintf("Post (%v) successfully updated", post.ID.Hex()))
+	}
+}
 func (s *Server) handlePostDelete() http.HandlerFunc {
 	type req struct {
 		ID primitive.ObjectID `json:"deletedID"`
