@@ -224,14 +224,6 @@ func (s *Server) handlePostUpdate() http.HandlerFunc {
 			return
 		}
 
-		// if err = post.Validate(); err != nil {
-		// 	s.logger.Logf("[ERROR] %v\n", err)
-		// 	s.error(w, r, http.StatusBadRequest, err)
-		// 	return
-		// }
-
-		// if err = s.store.Posts().Update(bson.M{"_id": post.ID}, bson.M{"$set": post}); err != nil {
-
 		if err = s.store.Posts().Update(post); err != nil {
 			s.logger.Logf("[ERROR] %v\n", err)
 			s.error(w, r, http.StatusBadRequest, err)
@@ -708,15 +700,9 @@ func (s *Server) handlePageUpdate() http.HandlerFunc {
 			return
 		}
 
-		if err = page.Validate(); err != nil {
+		if err = s.store.Pages().Update(page); err != nil {
 			s.logger.Logf("[ERROR] %v\n", err)
-			s.error(w, r, http.StatusInternalServerError, err)
-			return
-		}
-
-		if err = s.store.Pages().Update(bson.M{"_id": page.ID}, bson.M{"$set": page}); err != nil {
-			s.logger.Logf("[ERROR] %v\n", err)
-			s.error(w, r, http.StatusInternalServerError, err)
+			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
 

@@ -109,8 +109,12 @@ func (p PageRepository) updateOne(filter bson.M, update bson.M, opts ...*options
 	return nil
 }
 
-func (p PageRepository) Update(filter bson.M, update bson.M, opts ...*options.UpdateOptions) error {
-	return p.updateOne(filter, update, opts...)
+func (p PageRepository) Update(updatedPage *models.Page) error {
+	if err := updatedPage.Validate(); err != nil {
+		return nil
+	}
+
+	return p.updateOne(bson.M{"_id": updatedPage.ID}, bson.M{"$set": updatedPage})
 }
 
 // Delete marks page as deleted
