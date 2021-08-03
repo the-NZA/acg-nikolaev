@@ -73,6 +73,14 @@ func (s *Server) configureRouter() {
 	})
 	// Pages END
 
+	s.router.NotFound(func(w http.ResponseWriter, r *http.Request) {
+		s.logger.Logf("[DEBUG] 404!\n")
+		s.respond(w, r, http.StatusNotFound, map[string]string{
+			"page": "not found",
+			"you":  "must try another one",
+		})
+	})
+
 	// API Routes
 	s.router.Route("/api", func(r chi.Router) {
 		r.Use(s.authMiddleware)
