@@ -9,7 +9,7 @@
 	<title>{{.Page.Title}}</title>
 	<meta name="description" content="{{.Page.MetaDesc}}">
 
-	{{if gt .PageNum "1"}}
+	{{if gt .CurrentPage "1"}}
 		<link rel="canonical" href="/posts"/>
 	{{end}}
 </head>
@@ -23,12 +23,12 @@
 			</div>
 			<nav class="header__nav">
 				<ul class="menu">
-					<li class='menu__li {{ if eq .Page.Slug "/" }}menu__li-active{{end}}'><a href="/">Главная</a></li>
-					<li class='menu__li {{ if eq .Page.Slug "/services" }}menu__li-active{{end}}'><a href="/services">Услуги</a></li>
-					<li class='menu__li {{ if eq .Page.Slug "/about" }}menu__li-active{{end}}'><a href="/about">О компании</a></li>
-					<li class='menu__li {{ if eq .Page.Slug "/contacts" }}menu__li-active{{end}}'><a href="/contacts">Контакты</a></li>
-					<li class='menu__li {{ if eq .Page.Slug "/posts" }}menu__li-active{{end}}'><a href="/posts">Новости</a></li>
-					<li class='menu__li {{ if eq .Page.Slug "/materials" }}menu__li-active{{end}}'><a href="/materials">Материалы</a></li>
+					<li class='menu__li {{ if eq .Page.URL "/" }}menu__li-active{{end}}'><a href="/">Главная</a></li>
+					<li class='menu__li {{ if eq .Page.URL "/services" }}menu__li-active{{end}}'><a href="/services">Услуги</a></li>
+					<li class='menu__li {{ if eq .Page.URL "/about" }}menu__li-active{{end}}'><a href="/about">О компании</a></li>
+					<li class='menu__li {{ if eq .Page.URL "/contacts" }}menu__li-active{{end}}'><a href="/contacts">Контакты</a></li>
+					<li class='menu__li {{ if eq .Page.URL "/posts" }}menu__li-active{{end}}'><a href="/posts">Новости</a></li>
+					<li class='menu__li {{ if eq .Page.URL "/materials" }}menu__li-active{{end}}'><a href="/materials">Материалы</a></li>
 				</ul>
 			</nav>
 			<button class="header__mobtoggler ">

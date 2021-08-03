@@ -38,9 +38,7 @@ func (s *Server) configureRouter() {
 	s.router.Get("/contacts", s.handleContactsPage())
 
 	s.router.Route("/posts", func(r chi.Router) {
-		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("posts"))
-		})
+		r.Get("/", s.handlePostsPage())
 
 		r.Get("/{postSlug:[a-z-]+}", func(w http.ResponseWriter, r *http.Request) {
 			slug := chi.URLParam(r, "postSlug")
@@ -64,6 +62,14 @@ func (s *Server) configureRouter() {
 
 			w.Write([]byte(slug))
 		})
+	})
+
+	s.router.Get("/404", func(w http.ResponseWriter, r *http.Request) {
+		s.respond(w, r, http.StatusNotFound, map[string]string{
+			"page": "not found",
+			"you":  "must try another one",
+		})
+
 	})
 	// Pages END
 

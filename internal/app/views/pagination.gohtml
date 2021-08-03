@@ -2,19 +2,19 @@
 <div class="pagination">
 	<div class="pagination__container">
 		<ul class="pagination__list">
-			{{$base_uri := .Page.Slug}}
-			{{$page_num := .PageNum}}
+			{{$page_url := .Page.URL}}
+			{{$page_num := .CurrentPage}}
 			{{range .Pagination}}
 				{{if eq .Link ""}}
 					<li class="pagination__link">
-						<a>{{.Name}}</a>
+						<a>{{.Value}}</a>
 					</li>
 				{{else}}
 					<li class="pagination__link {{if eq .Link $page_num}}pagination__link--active{{end}}">
 						{{if eq .Link "1"}}
-							<a href="{{$base_uri}}">{{.Name}}</a>
+							<a href="{{$page_url}}">{{.Value}}</a>
 						{{else}}
-							<a href="{{$base_uri}}/{{.Link}}">{{.Name}}</a>
+							<a href="{{$page_url}}?page={{.Link}}">{{.Value}}</a>
 						{{end}}
 					</li>
 				{{end}}

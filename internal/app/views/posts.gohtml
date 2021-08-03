@@ -12,9 +12,9 @@
 				</h3>
 				<div class="widget__content">
 					<ul>
-					{{$slug := .Page.Slug}}
+					{{$page_url := .Page.URL}}
 					{{range .Categories}}
-						<li><a href="{{.URL}}" class="{{if eq $slug .URL}}active{{end}}">{{.Title}}</a></li>
+						<li><a href="{{.URL}}" class="{{if eq $page_url .URL}}active{{end}}">{{.Title}}</a></li>
 					{{end}}
 					</ul>
 				</div>
@@ -35,7 +35,7 @@
 							{{.Title}}
 						</h4>
 						<p class="post_card__text">
-							{{.Excerpt}}
+							{{.Snippet}}
 						</p>
 						<div class="post_card__footer">
 							<a href="{{.URL}}" class="post_card__btn">Читать</a>
@@ -45,7 +45,7 @@
 				</div>
 				{{end}}
 			</div>
-			{{if gt .PagesCnt 1}}
+			{{if gt .NumberOfPages 1}}
 				{{template "pagination" .}}
 			{{end}}
 		</main>
