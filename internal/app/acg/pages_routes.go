@@ -118,24 +118,8 @@ func (s *Server) handlePostsPage() http.HandlerFunc {
 
 		maxPageNumber := numOfPosts/postPerPage + 1
 		if pageNumber > uint64(maxPageNumber) {
-			// s.logger.Logf("[DEBUG] redirect to page %d\n", maxPageNumber)
-			// http.Redirect(w, r, fmt.Sprintf("/posts?page=%d", maxPageNumber), http.StatusPermanentRedirect)
-			// return
 			pageNumber = uint64(maxPageNumber)
 		}
-
-		// Find options for pagination
-		// findOptions := options.Find()
-		// findOptions.SetLimit(postPerPage)
-		// findOptions.SetSort(bson.M{"time": -1})
-		// findOptions.SetSkip((int64(pageNumber) - 1) * postPerPage)
-
-		// posts, err := s.store.Posts().Find(bson.M{"deleted": false}, findOptions)
-		// if err != nil {
-		// 	s.logger.Logf("[DEBUG] %v\n", err)
-		// 	http.Redirect(w, r, "/404", http.StatusSeeOther)
-		// 	return
-		// }
 
 		numOfSkip := (pageNumber - 1) * postPerPage
 

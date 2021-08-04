@@ -10,11 +10,10 @@ import (
 
 // Post is a structure for each post
 type Post struct {
-	ID      primitive.ObjectID `bson:"_id" json:"_id"`
-	Title   string             `bson:"title,omitempty" json:"title,omitempty"`
-	Snippet string             `bson:"snippet,omitempty" json:"snippet,omitempty"`
-	Slug    string             `bson:"slug,omitempty" json:"slug,omitempty"`
-	// URL          string             `bson:"url,omitempty" json:"url,omitempty"`
+	ID           primitive.ObjectID `bson:"_id" json:"_id"`
+	Title        string             `bson:"title,omitempty" json:"title,omitempty"`
+	Snippet      string             `bson:"snippet,omitempty" json:"snippet,omitempty"`
+	Slug         string             `bson:"slug,omitempty" json:"slug,omitempty"`
 	CategoryID   primitive.ObjectID `bson:"category_id,omitempty" json:"category_id,omitempty"`
 	CategorySlug string             `bson:"category_slug"` // Not empty only during aggregation on posts collection
 	Time         time.Time          `bson:"time,omitempty" json:"time,omitempty"`
@@ -29,6 +28,7 @@ func (p Post) TimeString() string {
 	return p.Time.Format("02.01.2006")
 }
 
+// GetURL generates url for post with CategorySlug field (must be aggregated before use)
 func (p Post) GetURL() string {
 	return "/category/" + p.CategorySlug + "/" + p.Slug
 }
@@ -40,7 +40,6 @@ func (p Post) Validate() error {
 		validation.Field(&p.Title, validation.Required, validation.RuneLength(5, 55)),
 		validation.Field(&p.Snippet, validation.Required, validation.RuneLength(50, 255)),
 		validation.Field(&p.Slug, validation.Required, validation.RuneLength(5, 255)),
-		// validation.Field(&p.URL, validation.Required, validation.RuneLength(5, 255)),
 		validation.Field(&p.CategoryID, validation.Required, validation.By(helpers.CheckObjectID)),
 		validation.Field(&p.CategorySlug, validation.Empty),
 		validation.Field(&p.MetaDesc, validation.Required, validation.RuneLength(50, 255)),

@@ -119,6 +119,7 @@ func (p PostRepository) Find(filter bson.M, opts ...*options.FindOptions) ([]*mo
 	return posts, nil
 }
 
+// Aggregate gives opportunity to create more complex queries including 'joins' and etc
 func (p PostRepository) Aggregate(pipeline mongo.Pipeline, opts ...*options.AggregateOptions) ([]*models.Post, error) {
 	var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
