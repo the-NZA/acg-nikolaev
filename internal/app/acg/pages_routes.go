@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/the-NZA/acg-nikolaev/internal/app/helpers"
 	"github.com/the-NZA/acg-nikolaev/internal/app/models"
 	"go.mongodb.org/mongo-driver/bson"
@@ -118,12 +119,15 @@ func (s *Server) handlePostsPage() http.HandlerFunc {
 			maxPageNumber++
 		}
 
+		// If pageNumber out of maximum
 		if pageNumber > uint64(maxPageNumber) {
 			pageNumber = uint64(maxPageNumber)
 		}
 
+		// Number of posts to skip
 		numOfSkip := (pageNumber - 1) * postPerPage
 
+		// Find posts with joining information from categories colleciton
 		posts, err := s.store.Posts().Aggregate(mongo.Pipeline{
 			bson.D{{"$lookup", bson.D{{"from", "categories"}, {"localField", "category_id"}, {"foreignField", "_id"}, {"as", "category_slug"}}}},
 			bson.D{{"$match", bson.D{{"deleted", false}}}},
@@ -161,6 +165,16 @@ func (s *Server) handlePostsPage() http.HandlerFunc {
 			s.error(w, r, http.StatusInternalServerError, err)
 			// http.Redirect(w, r, "/404", http.StatusSeeOther)
 		}
+	}
+}
+
+func (s *Server) handleSinglePostPage() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		categorySlug := chi.URLParam(r, "categorySlug")
+		postSlug := chi.URLParam(r, "postSlug")
+		s.logger.Logf("[DEBUG] cat: %v, post: %v\n", categorySlug, postSlug)
+
+		s.respond(w, r, http.StatusOK, "OK")
 	}
 }
 
