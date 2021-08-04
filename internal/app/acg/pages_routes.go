@@ -177,17 +177,15 @@ func (s *Server) handleSinglePostPage() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		var err error
-		categorySlug := chi.URLParam(r, "categorySlug")
-		postSlug := chi.URLParam(r, "postSlug")
 
-		category, err := s.store.Categories().FindBySlug(categorySlug)
+		category, err := s.store.Categories().FindBySlug(chi.URLParam(r, "categorySlug"))
 		if err != nil {
 			s.logger.Logf("[DEBUG] %v\n", err)
 			http.Redirect(w, r, "/404", http.StatusSeeOther)
 			return
 		}
 
-		post, err := s.store.Posts().FindBySlug(postSlug)
+		post, err := s.store.Posts().FindBySlug(chi.URLParam(r, "postSlug"))
 		if err != nil {
 			s.logger.Logf("[DEBUG] %v\n", err)
 			http.Redirect(w, r, "/404", http.StatusSeeOther)
@@ -203,6 +201,16 @@ func (s *Server) handleSinglePostPage() http.HandlerFunc {
 			s.logger.Logf("[DEBUG] %v\n", err)
 		}
 
+	}
+}
+
+func (s *Server) handleSingleCategoryPage() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		categorySlug := chi.URLParam(r, "categorySlug")
+
+		s.logger.Logf("INFO %v\n", categorySlug)
+
+		w.Write([]byte(categorySlug))
 	}
 }
 

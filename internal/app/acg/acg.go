@@ -55,13 +55,7 @@ func (s *Server) configureRouter() {
 			w.Write([]byte("category"))
 		})
 
-		r.Get("/{categorySlug:[a-z-]+}", func(w http.ResponseWriter, r *http.Request) {
-			slug := chi.URLParam(r, "categorySlug")
-
-			s.logger.Logf("INFO %v\n", slug)
-
-			w.Write([]byte(slug))
-		})
+		r.Get("/{categorySlug:[a-z0-9_-]+}", s.handleSingleCategoryPage())
 
 		r.Get("/{categorySlug:[a-z0-9_-]+}/{postSlug:[a-z0-9_-]+}", s.handleSinglePostPage())
 	})
