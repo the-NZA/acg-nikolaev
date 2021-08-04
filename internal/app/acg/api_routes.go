@@ -155,7 +155,7 @@ func (s *Server) handlePostCreate() http.HandlerFunc {
 			return
 		}
 
-		cat, err := s.store.Categories().FindByID(post.CategoryID)
+		_, err = s.store.Categories().FindByID(post.CategoryID)
 		if err != nil {
 			switch err {
 			case mongo.ErrNoDocuments:
@@ -169,9 +169,6 @@ func (s *Server) handlePostCreate() http.HandlerFunc {
 		}
 
 		post.Slug = helpers.GenerateSlug(post.Title)
-		post.URL = cat.URL() + "/" + post.Slug
-
-		// post.URL = fmt.Sprintf("/%s/%s", cat.Slug, helpers.GenerateSlug(post.Title))
 
 		if err = s.store.Posts().Create(post); err != nil {
 			s.logger.Logf("[ERROR] %v\n", err)

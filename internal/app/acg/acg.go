@@ -73,6 +73,7 @@ func (s *Server) configureRouter() {
 	})
 	// Pages END
 
+	// Not Found
 	s.router.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		s.logger.Logf("[DEBUG] 404!\n")
 		s.respond(w, r, http.StatusNotFound, map[string]string{
@@ -80,6 +81,7 @@ func (s *Server) configureRouter() {
 			"you":  "must try another one",
 		})
 	})
+	// Not Found END
 
 	// API Routes
 	s.router.Route("/api", func(r chi.Router) {

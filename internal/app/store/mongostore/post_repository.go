@@ -8,6 +8,7 @@ import (
 	"github.com/the-NZA/acg-nikolaev/internal/app/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -26,7 +27,7 @@ func (p PostRepository) Create(post *models.Post) error {
 		return err
 	}
 
-	fpost, _ := p.FindByURL(post.URL)
+	fpost, _ := p.FindBySlug(post.Slug)
 	if fpost != nil {
 		return helpers.ErrPostAlreadyExist
 	}
@@ -104,6 +105,28 @@ func (p PostRepository) Find(filter bson.M, opts ...*options.FindOptions) ([]*mo
 	col := db.Collection(p.collectionName)
 
 	res, err := col.Find(ctx, filter, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	posts := make([]*models.Post, 0)
+
+	err = res.All(ctx, &posts)
+	if err != nil {
+		return nil, err
+	}
+
+	return posts, nil
+}
+
+func (p PostRepository) Aggregate(pipeline mongo.Pipeline, opts ...*options.AggregateOptions) ([]*models.Post, error) {
+	var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	db := p.store.db.Database(dbName)
+	col := db.Collection(p.collectionName)
+
+	res, err := col.Aggregate(ctx, pipeline, opts...)
 	if err != nil {
 		return nil, err
 	}

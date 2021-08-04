@@ -6,6 +6,7 @@ import (
 	"github.com/the-NZA/acg-nikolaev/internal/app/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -16,6 +17,7 @@ type IPostRepository interface {
 	FindBySlug(string) (*models.Post, error)
 	FindByURL(string) (*models.Post, error)
 	FindAll(bson.M) ([]*models.Post, error)
+	Aggregate(mongo.Pipeline, ...*options.AggregateOptions) ([]*models.Post, error)
 	Count(...*options.CountOptions) (int64, error)
 	Update(*models.Post) error
 	Delete(primitive.ObjectID) error
