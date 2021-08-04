@@ -169,12 +169,40 @@ func (s *Server) handlePostsPage() http.HandlerFunc {
 }
 
 func (s *Server) handleSinglePostPage() http.HandlerFunc {
+	type singlePost struct {
+		*models.Post
+		CategoryName string
+		CategoryURL  string
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
+		var err error
 		categorySlug := chi.URLParam(r, "categorySlug")
 		postSlug := chi.URLParam(r, "postSlug")
-		s.logger.Logf("[DEBUG] cat: %v, post: %v\n", categorySlug, postSlug)
 
-		s.respond(w, r, http.StatusOK, "OK")
+		category, err := s.store.Categories().FindBySlug(categorySlug)
+		if err != nil {
+			s.logger.Logf("[DEBUG] %v\n", err)
+			http.Redirect(w, r, "/404", http.StatusSeeOther)
+			return
+		}
+
+		post, err := s.store.Posts().FindBySlug(postSlug)
+		if err != nil {
+			s.logger.Logf("[DEBUG] %v\n", err)
+			http.Redirect(w, r, "/404", http.StatusSeeOther)
+			return
+		}
+
+		err = tmpl.ExecuteTemplate(w, "singlepost.gohtml", &singlePost{
+			Post:         post,
+			CategoryName: category.Title,
+			CategoryURL:  category.URL(),
+		})
+		if err != nil {
+			s.logger.Logf("[DEBUG] %v\n", err)
+		}
+
 	}
 }
 

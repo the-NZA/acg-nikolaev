@@ -68,6 +68,7 @@ func (p PostRepository) FindBySlug(slug string) (*models.Post, error) {
 }
 
 // FindByURL return all posts by it URL
+// ! DEPRECATED because of no url field
 func (p PostRepository) FindByURL(URL string) (*models.Post, error) {
 	return p.findOne(bson.M{"url": URL, "deleted": false})
 }
