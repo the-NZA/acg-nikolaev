@@ -10,7 +10,6 @@ import (
 	"github.com/the-NZA/acg-nikolaev/internal/app/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var (
@@ -44,22 +43,28 @@ func (s *Server) handleHomePage() http.HandlerFunc {
 			http.Redirect(w, r, "/404", http.StatusNotFound)
 		}
 
-		findOptions := options.Find()
-		findOptions.SetLimit(3)
-		findOptions.SetSort(bson.M{"time": -1})
-
-		posts, err := s.store.Posts().Find(bson.M{"deleted": false}, findOptions)
+		posts, err := s.store.Posts().Aggregate(mongo.Pipeline{
+			bson.D{{"$lookup", bson.D{{"from", "categories"}, {"localField", "category_id"}, {"foreignField", "_id"}, {"as", "category_slug"}}}},
+			bson.D{{"$match", bson.D{{"deleted", false}}}},
+			bson.D{{"$project", bson.D{{"title", 1}, {"snippet", 1}, {"postimg", 1}, {"time", 1}, {"slug", 1}, {"category_slug", "$category_slug.slug"}}}},
+			bson.D{{"$sort", bson.D{{"time", -1}}}},
+			bson.D{{"$limit", 3}},
+			bson.D{{"$unwind", "$category_slug"}}})
 		if err != nil {
-			s.logger.Logf("[DEBUG] posts: %v\n", err)
-			http.Redirect(w, r, "/404", http.StatusNotFound)
+			s.logger.Logf("[DEBUG] %v\n", err)
+			http.Redirect(w, r, "/404", http.StatusSeeOther)
 			return
 		}
 
-		tmpl.ExecuteTemplate(w, "index.gohtml", &homepage{
+		err = tmpl.ExecuteTemplate(w, "index.gohtml", &homepage{
 			Page:     page,
 			Services: services,
 			Posts:    posts,
 		})
+		if err != nil {
+			s.logger.Logf("[DEBUG] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+		}
 	}
 }
 

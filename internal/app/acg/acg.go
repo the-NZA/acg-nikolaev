@@ -52,7 +52,8 @@ func (s *Server) configureRouter() {
 
 	s.router.Route("/category", func(r chi.Router) {
 		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("category"))
+			// NOTE: Just redirect to /posts page for now
+			http.Redirect(w, r, "/posts", http.StatusSeeOther)
 		})
 
 		r.Get("/{categorySlug:[a-z0-9_-]+}", s.handleSingleCategoryPage())
@@ -71,7 +72,7 @@ func (s *Server) configureRouter() {
 
 	// Not Found
 	s.router.NotFound(func(w http.ResponseWriter, r *http.Request) {
-		s.logger.Logf("[DEBUG] 404!\n")
+		s.logger.Logf("[DEBUG] 404 at %v\n", r.URL.Path)
 		s.respond(w, r, http.StatusNotFound, map[string]string{
 			"page": "not found",
 			"you":  "must try another one",
