@@ -11,6 +11,7 @@ import (
 	"github.com/the-NZA/acg-nikolaev/internal/app/helpers"
 	"github.com/the-NZA/acg-nikolaev/internal/app/models"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -19,7 +20,7 @@ var (
 	err  error
 )
 
-const postPerPage = 15
+const postPerPage = 2
 
 func init() {
 	tmpl = template.Must(template.ParseGlob("internal/*/views/*.gohtml"))
@@ -83,7 +84,7 @@ func (s *Server) handleAboutPage() http.HandlerFunc {
 }
 
 func (s *Server) handlePostsPage() http.HandlerFunc {
-	type postspage struct {
+	type postsPage struct {
 		Page          *models.Page
 		Posts         []*models.Post
 		Categories    []*models.Category
@@ -113,7 +114,7 @@ func (s *Server) handlePostsPage() http.HandlerFunc {
 			pageNumber = 1
 		}
 
-		numOfPosts, err := s.store.Posts().Count()
+		numOfPosts, err := s.store.Posts().Count(bson.D{{"deleted", false}})
 		if err != nil {
 			s.logger.Logf("[DEBUG] page: %v\n", err)
 			http.Redirect(w, r, "/404", http.StatusSeeOther)
@@ -160,7 +161,7 @@ func (s *Server) handlePostsPage() http.HandlerFunc {
 			return
 		}
 
-		err = tmpl.ExecuteTemplate(w, "posts.gohtml", &postspage{
+		err = tmpl.ExecuteTemplate(w, "posts.gohtml", &postsPage{
 			Page:          page,
 			Posts:         posts,
 			Categories:    categories,
@@ -209,6 +210,8 @@ func (s *Server) handleSinglePostPage() http.HandlerFunc {
 		})
 		if err != nil {
 			s.logger.Logf("[DEBUG] %v\n", err)
+			http.Redirect(w, r, "/404", http.StatusSeeOther)
+			return
 		}
 
 		io.Copy(w, buf)
@@ -216,12 +219,113 @@ func (s *Server) handleSinglePostPage() http.HandlerFunc {
 }
 
 func (s *Server) handleSingleCategoryPage() http.HandlerFunc {
+	type categoryPage struct {
+		Page            *models.Page
+		Posts           []*models.Post
+		CurrentCategory primitive.ObjectID
+		Categories      []*models.Category
+		Pagination      []helpers.PaginationLink
+		NumberOfPages   int
+		CurrentPage     string
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
-		categorySlug := chi.URLParam(r, "categorySlug")
+		var pageNumber uint64
 
-		s.logger.Logf("INFO %v\n", categorySlug)
+		pNum := r.URL.Query().Get("page")
+		if pNum != "" {
+			pageNumber, err = strconv.ParseUint(pNum, 10, 64)
+			if err != nil {
+				s.logger.Logf("[DEBUG] %v\n", err)
+				http.Redirect(w, r, "/posts", http.StatusSeeOther)
+				return
+			}
+		} else {
+			pageNumber = 1
+		}
 
-		w.Write([]byte(categorySlug))
+		category, err := s.store.Categories().FindBySlug(chi.URLParam(r, "categorySlug"))
+		if err != nil {
+			s.logger.Logf("[DEBUG] %v\n", err)
+			http.Redirect(w, r, "/404", http.StatusSeeOther)
+			return
+		}
+
+		numOfPosts, err := s.store.Posts().Count(bson.D{{"deleted", false}, {"category_id", category.ID}})
+		if err != nil {
+			s.logger.Logf("[DEBUG] page: %v\n", err)
+			http.Redirect(w, r, "/404", http.StatusSeeOther)
+		}
+
+		if pageNumber == 0 {
+			s.logger.Logf("[DEBUG] %v\n", pageNumber)
+		}
+
+		// Calculate maximum number of pages
+		maxPageNumber := numOfPosts / postPerPage
+
+		// Fix number maximum number of pages for odd value
+		if numOfPosts%postPerPage != 0 {
+			maxPageNumber++
+		}
+
+		// If pageNumber out of maximum
+		if pageNumber > uint64(maxPageNumber) {
+			pageNumber = uint64(maxPageNumber)
+		}
+
+		// s.logger.Logf("[DEBUG] maxPageNum: %v, pageNum: %v\n", maxPageNumber, pageNumber)
+
+		// Number of posts to skip
+		numOfSkip := (pageNumber - 1) * postPerPage
+
+		// Find posts with joining information from categories colleciton
+		posts, err := s.store.Posts().Aggregate(mongo.Pipeline{
+			bson.D{{"$lookup", bson.D{{"from", "categories"}, {"localField", "category_id"}, {"foreignField", "_id"}, {"as", "category_slug"}}}},
+			bson.D{{"$match", bson.D{{"deleted", false}, {"category_id", category.ID}}}},
+			bson.D{{"$project", bson.D{{"title", 1}, {"snippet", 1}, {"postimg", 1}, {"time", 1}, {"slug", 1}, {"category_slug", "$category_slug.slug"}}}},
+			bson.D{{"$sort", bson.D{{"time", -1}}}},
+			bson.D{{"$skip", numOfSkip}},
+			bson.D{{"$limit", postPerPage}},
+			bson.D{{"$unwind", "$category_slug"}}})
+		if err != nil {
+			s.logger.Logf("[DEBUG] %v\n", err)
+			http.Redirect(w, r, "/404", http.StatusSeeOther)
+			return
+		}
+
+		// Generate pagination slice
+		pagination := helpers.GeneratePagination(uint(pageNumber), uint(maxPageNumber))
+
+		categories, err := s.store.Categories().FindAll(bson.M{"deleted": false})
+		if err != nil {
+			s.logger.Logf("[DEBUG] %v\n", err)
+			http.Redirect(w, r, "/404", http.StatusSeeOther)
+			return
+		}
+
+		buf := &bytes.Buffer{}
+
+		err = tmpl.ExecuteTemplate(buf, "category.gohtml", &categoryPage{
+			Page: &models.Page{
+				Title:    category.Title,
+				Subtitle: category.Subtitle,
+				MetaDesc: category.MetaDesc,
+				URL:      category.URL(),
+			},
+			Posts:           posts,
+			CurrentCategory: category.ID,
+			Categories:      categories,
+			Pagination:      pagination,
+			NumberOfPages:   int(maxPageNumber),
+			CurrentPage:     strconv.Itoa(int(pageNumber)),
+		})
+		if err != nil {
+			s.logger.Logf("[DEBUG] %v\n", err)
+			http.Redirect(w, r, "/404", http.StatusSeeOther)
+		}
+
+		io.Copy(w, buf)
 	}
 }
 

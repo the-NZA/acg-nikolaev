@@ -39,15 +39,6 @@ func (s *Server) configureRouter() {
 
 	s.router.Route("/posts", func(r chi.Router) {
 		r.Get("/", s.handlePostsPage())
-
-		// r.Get("/{postSlug:[a-z-]+}", func(w http.ResponseWriter, r *http.Request) {
-		// 	slug := chi.URLParam(r, "postSlug")
-
-		// 	s.logger.Logf("INFO %v\n", slug)
-
-		// 	w.Write([]byte(slug))
-
-		// })
 	})
 
 	s.router.Route("/category", func(r chi.Router) {
