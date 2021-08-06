@@ -52,7 +52,7 @@ func (s *Server) configureRouter() {
 
 	s.router.Route("/category", func(r chi.Router) {
 		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-			// NOTE: Just redirect to /posts page for now
+			// * NOTE: Just redirect to /posts page for now
 			http.Redirect(w, r, "/posts", http.StatusSeeOther)
 		})
 

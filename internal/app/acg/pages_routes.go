@@ -1,7 +1,9 @@
 package acg
 
 import (
+	"bytes"
 	"html/template"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -119,6 +121,7 @@ func (s *Server) handlePostsPage() http.HandlerFunc {
 
 		// Calculate maximum number of pages
 		maxPageNumber := numOfPosts / postPerPage
+
 		// Fix number maximum number of pages for odd value
 		if numOfPosts%postPerPage != 0 {
 			maxPageNumber++
@@ -197,7 +200,9 @@ func (s *Server) handleSinglePostPage() http.HandlerFunc {
 			return
 		}
 
-		err = tmpl.ExecuteTemplate(w, "singlepost.gohtml", &singlePost{
+		buf := &bytes.Buffer{}
+
+		err = tmpl.ExecuteTemplate(buf, "singlepost.gohtml", &singlePost{
 			Post:         post,
 			CategoryName: category.Title,
 			CategoryURL:  category.URL(),
@@ -206,6 +211,7 @@ func (s *Server) handleSinglePostPage() http.HandlerFunc {
 			s.logger.Logf("[DEBUG] %v\n", err)
 		}
 
+		io.Copy(w, buf)
 	}
 }
 
