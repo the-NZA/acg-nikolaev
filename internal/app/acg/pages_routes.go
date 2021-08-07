@@ -47,12 +47,22 @@ func (s *Server) handleHomePage() http.HandlerFunc {
 		}
 
 		posts, err := s.store.Posts().Aggregate(mongo.Pipeline{
-			bson.D{{"$lookup", bson.D{{"from", "categories"}, {"localField", "category_id"}, {"foreignField", "_id"}, {"as", "category_slug"}}}},
-			bson.D{{"$match", bson.D{{"deleted", false}}}},
-			bson.D{{"$project", bson.D{{"title", 1}, {"snippet", 1}, {"postimg", 1}, {"time", 1}, {"slug", 1}, {"category_slug", "$category_slug.slug"}}}},
-			bson.D{{"$sort", bson.D{{"time", -1}}}},
-			bson.D{{"$limit", 3}},
-			bson.D{{"$unwind", "$category_slug"}}})
+			bson.D{{Key: "$lookup", Value: bson.D{
+				{Key: "from", Value: "categories"},
+				{Key: "localField", Value: "category_id"},
+				{Key: "foreignField", Value: "_id"},
+				{Key: "as", Value: "category_slug"}}}},
+			bson.D{{Key: "$match", Value: bson.D{{Key: "deleted", Value: false}}}},
+			bson.D{{Key: "$project", Value: bson.D{
+				{Key: "title", Value: 1},
+				{Key: "snippet", Value: 1},
+				{Key: "postimg", Value: 1},
+				{Key: "time", Value: 1},
+				{Key: "slug", Value: 1},
+				{Key: "category_slug", Value: "$category_slug.slug"}}}},
+			bson.D{{Key: "$sort", Value: bson.D{{Key: "time", Value: -1}}}},
+			bson.D{{Key: "$limit", Value: 3}},
+			bson.D{{Key: "$unwind", Value: "$category_slug"}}})
 		if err != nil {
 			s.logger.Logf("[DEBUG] %v\n", err)
 			http.Redirect(w, r, "/404", http.StatusSeeOther)
@@ -114,7 +124,7 @@ func (s *Server) handlePostsPage() http.HandlerFunc {
 			pageNumber = 1
 		}
 
-		numOfPosts, err := s.store.Posts().Count(bson.D{{"deleted", false}})
+		numOfPosts, err := s.store.Posts().Count(bson.D{{Key: "deleted", Value: false}})
 		if err != nil {
 			s.logger.Logf("[DEBUG] page: %v\n", err)
 			http.Redirect(w, r, "/404", http.StatusSeeOther)
@@ -251,7 +261,7 @@ func (s *Server) handleSingleCategoryPage() http.HandlerFunc {
 			return
 		}
 
-		numOfPosts, err := s.store.Posts().Count(bson.D{{"deleted", false}, {"category_id", category.ID}})
+		numOfPosts, err := s.store.Posts().Count(bson.D{{Key: "deleted", Value: false}, {Key: "category_id", Value: category.ID}})
 		if err != nil {
 			s.logger.Logf("[DEBUG] page: %v\n", err)
 			http.Redirect(w, r, "/404", http.StatusSeeOther)
@@ -328,11 +338,6 @@ func (s *Server) handleSingleCategoryPage() http.HandlerFunc {
 }
 
 func (s *Server) handleMaterialsPage() http.HandlerFunc {
-	type matcat struct {
-		models.MatCategory
-		Materials []models.Material
-	}
-
 	type materialsPage struct {
 		Page    *models.Page
 		MatCats []*models.MaterialShow
@@ -400,7 +405,6 @@ func (s *Server) handleMaterialsPage() http.HandlerFunc {
 		})
 		if err != nil {
 			s.logger.Logf("[DEBUG] %v\n", err)
-			// s.error(w, r, http.StatusInternalServerError, err)
 			http.Redirect(w, r, "/404", http.StatusSeeOther)
 			return
 		}

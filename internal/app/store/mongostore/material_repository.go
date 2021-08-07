@@ -70,6 +70,7 @@ func (m MaterialRepository) FindByID(ID primitive.ObjectID) (*models.Material, e
 	return m.findOne(bson.M{"_id": ID, "deleted": false})
 }
 
+// FindAll return all materials by filter parameter
 func (m MaterialRepository) FindAll(filter bson.M) ([]*models.Material, error) {
 	var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()

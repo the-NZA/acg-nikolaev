@@ -43,7 +43,12 @@ func (s *Server) configureRouter() {
 
 	s.router.Get("/about", s.handleAboutPage())
 
-	s.router.Get("/materials", s.handleMaterialsPage())
+	// s.router.Get("/materials")
+
+	s.router.Route("/materials", func(r chi.Router) {
+		r.Get("/", s.handleMaterialsPage())
+		r.Get("/{matCatSlug:[a-z0-9_-]+}", s.handleMaterialGetAllBySlug())
+	})
 
 	s.router.Get("/services", s.handleServicesPage())
 

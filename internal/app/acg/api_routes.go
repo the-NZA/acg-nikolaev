@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/the-NZA/acg-nikolaev/internal/app/helpers"
 	"github.com/the-NZA/acg-nikolaev/internal/app/models"
 	"go.mongodb.org/mongo-driver/bson"
@@ -447,7 +448,7 @@ func (s *Server) handleMatCategoryGetBySlug() http.HandlerFunc {
 	}
 }
 
-func (s *Server) handleMaterialDelete() http.HandlerFunc {
+func (s *Server) handleMatCategoryDelete() http.HandlerFunc {
 	type req struct {
 		ID primitive.ObjectID `json:"deletedID"`
 	}
@@ -467,26 +468,26 @@ func (s *Server) handleMaterialDelete() http.HandlerFunc {
 			return
 		}
 
-		if err = s.store.Materials().Delete(req.ID); err != nil {
+		if err = s.store.MatCategories().Delete(req.ID); err != nil {
 			s.logger.Logf("[ERROR] %v\n", err)
 			s.error(w, r, http.StatusInternalServerError, err)
 			return
 		}
 
-		s.respond(w, r, http.StatusOK, fmt.Sprintf("Material (%s) successfully deleted", req.ID.Hex()))
+		s.respond(w, r, http.StatusOK, fmt.Sprintf("Material category (%s) successfully deleted", req.ID.Hex()))
 	}
 }
 
-func (s *Server) handleMaterialGetAll() http.HandlerFunc {
+func (s *Server) handleMatCategoryGetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		materials, err := s.store.Materials().FindAll(bson.M{"deleted": false})
+		services, err := s.store.MatCategories().FindAll(bson.M{"deleted": false})
 		if err != nil {
 			s.logger.Logf("[ERROR] %v\n", err)
 			s.error(w, r, http.StatusInternalServerError, err)
 			return
 		}
 
-		s.respond(w, r, http.StatusOK, materials)
+		s.respond(w, r, http.StatusOK, services)
 	}
 }
 
@@ -573,10 +574,11 @@ func (s *Server) handleMaterialGetByID() http.HandlerFunc {
 	}
 }
 
-func (s *Server) handleMatCategoryDelete() http.HandlerFunc {
+func (s *Server) handleMaterialDelete() http.HandlerFunc {
 	type req struct {
 		ID primitive.ObjectID `json:"deletedID"`
 	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := &req{}
 		var err error
@@ -593,26 +595,54 @@ func (s *Server) handleMatCategoryDelete() http.HandlerFunc {
 			return
 		}
 
-		if err = s.store.MatCategories().Delete(req.ID); err != nil {
+		if err = s.store.Materials().Delete(req.ID); err != nil {
 			s.logger.Logf("[ERROR] %v\n", err)
 			s.error(w, r, http.StatusInternalServerError, err)
 			return
 		}
 
-		s.respond(w, r, http.StatusOK, fmt.Sprintf("Material category (%s) successfully deleted", req.ID.Hex()))
+		s.respond(w, r, http.StatusOK, fmt.Sprintf("Material (%s) successfully deleted", req.ID.Hex()))
 	}
 }
 
-func (s *Server) handleMatCategoryGetAll() http.HandlerFunc {
+func (s *Server) handleMaterialGetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		services, err := s.store.MatCategories().FindAll(bson.M{"deleted": false})
+		materials, err := s.store.Materials().FindAll(bson.M{"deleted": false})
 		if err != nil {
 			s.logger.Logf("[ERROR] %v\n", err)
 			s.error(w, r, http.StatusInternalServerError, err)
 			return
 		}
 
-		s.respond(w, r, http.StatusOK, services)
+		s.respond(w, r, http.StatusOK, materials)
+	}
+}
+
+func (s *Server) handleMaterialGetAllBySlug() http.HandlerFunc {
+	type matCat struct {
+		*models.MatCategory
+		Materials []*models.Material `json:"materials,omitempty"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		matcat, err := s.store.MatCategories().FindBySlug(chi.URLParam(r, "matCatSlug"))
+		if err != nil {
+			s.logger.Logf("[DEBUG] %v\n", err)
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		materials, err := s.store.Materials().FindAll(bson.M{"matcategory_id": matcat.ID, "deleted": false})
+		if err != nil {
+			s.logger.Logf("[DEBUG] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, &matCat{
+			MatCategory: matcat,
+			Materials:   materials,
+		})
 	}
 }
 
