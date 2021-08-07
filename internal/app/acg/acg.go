@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 	"github.com/go-pkgz/lgr"
 	"github.com/the-NZA/acg-nikolaev/internal/app/store"
 	"github.com/the-NZA/acg-nikolaev/internal/app/store/mongostore"
@@ -26,6 +27,17 @@ func NewServer(config *Config) *Server {
 }
 
 func (s *Server) configureRouter() {
+	// CORS
+	s.router.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"https://*", "http://*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300, // Maximum value not ignored by any of major browsers
+	}))
+	// CORS END
+
 	// Pages Routes
 	s.router.Get("/", s.handleHomePage())
 
@@ -103,7 +115,7 @@ func (s *Server) configureRouter() {
 
 		r.Route("/matcategory", func(r chi.Router) {
 			r.Post("/", s.handleMatCategoryCreate())
-			r.Get("/", s.handleMatCategoryGetByID())
+			r.Get("/", s.handleMatCategoryGetBySlug())
 			r.Delete("/", s.handleMatCategoryDelete())
 			r.Get("/all", s.handleMatCategoryGetAll())
 		})
