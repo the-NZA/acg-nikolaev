@@ -20,6 +20,16 @@ type Material struct {
 	Deleted       bool               `bson:"deleted" json:"-"`
 }
 
+// MaterialShow represents material category with slice of materials for redreding in the browser
+type MaterialShow struct {
+	ID        primitive.ObjectID `bson:"_id" json:"_id"`
+	Title     string             `bson:"title,omitempty" json:"title,omitempty"`
+	Slug      string             `bson:"slug,omitempty" json:"slug,omitempty"`
+	Desc      string             `bson:"desc,omitempty" json:"desc,omitempty"`
+	Deleted   bool               `bson:"deleted" json:"-"`
+	Materials []*Material        `bson:"materials"`
+}
+
 // TimeString return formated time string
 func (m Material) TimeString() string {
 	return m.Time.Format("02.01.2006")

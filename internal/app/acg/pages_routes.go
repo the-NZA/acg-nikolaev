@@ -20,7 +20,7 @@ var (
 	err  error
 )
 
-const postPerPage = 2
+const postPerPage = 15
 
 func init() {
 	tmpl = template.Must(template.ParseGlob("internal/*/views/*.gohtml"))
@@ -274,8 +274,6 @@ func (s *Server) handleSingleCategoryPage() http.HandlerFunc {
 			pageNumber = uint64(maxPageNumber)
 		}
 
-		// s.logger.Logf("[DEBUG] maxPageNum: %v, pageNum: %v\n", maxPageNumber, pageNumber)
-
 		// Number of posts to skip
 		numOfSkip := (pageNumber - 1) * postPerPage
 
@@ -330,8 +328,95 @@ func (s *Server) handleSingleCategoryPage() http.HandlerFunc {
 }
 
 func (s *Server) handleMaterialsPage() http.HandlerFunc {
+	type matcat struct {
+		models.MatCategory
+		Materials []models.Material
+	}
+
+	type materialsPage struct {
+		Page    *models.Page
+		MatCats []*models.MaterialShow
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
-		s.respond(w, r, http.StatusOK, "This is materials page")
+		page, err := s.store.Pages().FindByURL(r.URL.Path)
+		if err != nil {
+			s.logger.Logf("[DEBUG] %v\n", err)
+			http.Redirect(w, r, "/404", http.StatusSeeOther)
+			return
+		}
+
+		mats, err := s.store.MatCategories().Aggregate(mongo.Pipeline{
+			{
+				{
+					Key: "$lookup", Value: bson.D{
+						{Key: "from", Value: "materials"},
+						{Key: "let", Value: bson.D{
+							{Key: "matcat_id", Value: "$_id"},
+						}},
+						{Key: "pipeline", Value: bson.A{
+							bson.D{
+								{Key: "$match", Value: bson.D{
+									{Key: "deleted", Value: false},
+								}},
+							},
+							bson.D{
+								{Key: "$sort", Value: bson.D{
+									{Key: "time", Value: -1},
+								}},
+							},
+							bson.D{
+								{Key: "$match", Value: bson.D{
+									{Key: "$expr", Value: bson.D{
+										{Key: "$eq", Value: bson.A{"$matcategory_id", "$$matcat_id"}},
+									}},
+								}},
+							}, bson.D{
+								{Key: "$limit", Value: 3},
+							},
+						}},
+						{Key: "as", Value: "materials"},
+					},
+				},
+			},
+			{
+				{
+					Key: "$match", Value: bson.D{
+						{Key: "deleted", Value: false},
+					},
+				},
+			},
+			{
+				{
+					Key: "$project", Value: bson.D{
+						{Key: "_id", Value: 1},
+						{Key: "title", Value: 1},
+						{Key: "slug", Value: 1},
+						{Key: "desc", Value: 1},
+						{Key: "materials", Value: 1},
+					},
+				},
+			},
+		})
+		if err != nil {
+			s.logger.Logf("[DEBUG] %v\n", err)
+			// s.error(w, r, http.StatusInternalServerError, err)
+			http.Redirect(w, r, "/404", http.StatusSeeOther)
+			return
+		}
+
+		buf := &bytes.Buffer{}
+
+		err = tmpl.ExecuteTemplate(buf, "materials.gohtml", materialsPage{
+			Page:    page,
+			MatCats: mats,
+		})
+		if err != nil {
+			s.logger.Logf("[DEBUG] %v\n", err)
+			http.Redirect(w, r, "/404", http.StatusSeeOther)
+		}
+
+		io.Copy(w, buf)
 	}
 }
 

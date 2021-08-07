@@ -8,6 +8,7 @@ import (
 	"github.com/the-NZA/acg-nikolaev/internal/app/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -59,12 +60,12 @@ func (m *MatCatRepository) findOne(filter bson.M, opts ...*options.FindOneOption
 	return matcat, nil
 }
 
-// Find material category by slug
+// FindBySlug material category by slug
 func (m MatCatRepository) FindBySlug(slug string) (*models.MatCategory, error) {
 	return m.findOne(bson.M{"slug": slug, "deleted": false})
 }
 
-// Find material category by it ID
+// FindByID material category by it ID
 func (m MatCatRepository) FindByID(ID primitive.ObjectID) (*models.MatCategory, error) {
 	return m.findOne(bson.M{"_id": ID, "deleted": false})
 }
@@ -90,6 +91,29 @@ func (m MatCatRepository) FindAll(filter bson.M) ([]*models.MatCategory, error) 
 	}
 
 	return matcats, nil
+}
+
+// Aggregate used to find and join materials and materials' categories for rendering in browser
+func (m MatCatRepository) Aggregate(pipeline mongo.Pipeline, opts ...*options.AggregateOptions) ([]*models.MaterialShow, error) {
+	var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	db := m.store.db.Database(dbName)
+	col := db.Collection(m.collectionName)
+
+	res, err := col.Aggregate(ctx, pipeline, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	mats := make([]*models.MaterialShow, 0)
+
+	err = res.All(ctx, &mats)
+	if err != nil {
+		return nil, err
+	}
+
+	return mats, nil
 }
 
 func (m MatCatRepository) updateOne(filter bson.M, update bson.M, opts ...*options.UpdateOptions) error {
