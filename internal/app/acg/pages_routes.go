@@ -47,22 +47,22 @@ func (s *Server) handleHomePage() http.HandlerFunc {
 		}
 
 		posts, err := s.store.Posts().Aggregate(mongo.Pipeline{
-			bson.D{{Key: "$lookup", Value: bson.D{
+			{{Key: "$lookup", Value: bson.D{
 				{Key: "from", Value: "categories"},
 				{Key: "localField", Value: "category_id"},
 				{Key: "foreignField", Value: "_id"},
 				{Key: "as", Value: "category_slug"}}}},
-			bson.D{{Key: "$match", Value: bson.D{{Key: "deleted", Value: false}}}},
-			bson.D{{Key: "$project", Value: bson.D{
+			{{Key: "$match", Value: bson.D{{Key: "deleted", Value: false}}}},
+			{{Key: "$project", Value: bson.D{
 				{Key: "title", Value: 1},
 				{Key: "snippet", Value: 1},
 				{Key: "postimg", Value: 1},
 				{Key: "time", Value: 1},
 				{Key: "slug", Value: 1},
 				{Key: "category_slug", Value: "$category_slug.slug"}}}},
-			bson.D{{Key: "$sort", Value: bson.D{{Key: "time", Value: -1}}}},
-			bson.D{{Key: "$limit", Value: 3}},
-			bson.D{{Key: "$unwind", Value: "$category_slug"}}})
+			{{Key: "$sort", Value: bson.D{{Key: "time", Value: -1}}}},
+			{{Key: "$limit", Value: 3}},
+			{{Key: "$unwind", Value: "$category_slug"}}})
 		if err != nil {
 			s.logger.Logf("[DEBUG] %v\n", err)
 			http.Redirect(w, r, "/404", http.StatusSeeOther)
@@ -148,13 +148,23 @@ func (s *Server) handlePostsPage() http.HandlerFunc {
 
 		// Find posts with joining information from categories colleciton
 		posts, err := s.store.Posts().Aggregate(mongo.Pipeline{
-			bson.D{{"$lookup", bson.D{{"from", "categories"}, {"localField", "category_id"}, {"foreignField", "_id"}, {"as", "category_slug"}}}},
-			bson.D{{"$match", bson.D{{"deleted", false}}}},
-			bson.D{{"$project", bson.D{{"title", 1}, {"snippet", 1}, {"postimg", 1}, {"time", 1}, {"slug", 1}, {"category_slug", "$category_slug.slug"}}}},
-			bson.D{{"$sort", bson.D{{"time", -1}}}},
-			bson.D{{"$skip", numOfSkip}},
-			bson.D{{"$limit", postPerPage}},
-			bson.D{{"$unwind", "$category_slug"}}})
+			{{"$lookup", bson.D{
+				{"from", "categories"},
+				{"localField", "category_id"},
+				{"foreignField", "_id"},
+				{"as", "category_slug"}}}},
+			{{"$match", bson.D{{"deleted", false}}}},
+			{{"$project", bson.D{
+				{"title", 1},
+				{"snippet", 1},
+				{"postimg", 1},
+				{"time", 1},
+				{"slug", 1},
+				{"category_slug", "$category_slug.slug"}}}},
+			{{"$sort", bson.D{{"time", -1}}}},
+			{{"$skip", numOfSkip}},
+			{{"$limit", postPerPage}},
+			{{"$unwind", "$category_slug"}}})
 		if err != nil {
 			s.logger.Logf("[DEBUG] %v\n", err)
 			http.Redirect(w, r, "/404", http.StatusSeeOther)
@@ -261,7 +271,10 @@ func (s *Server) handleSingleCategoryPage() http.HandlerFunc {
 			return
 		}
 
-		numOfPosts, err := s.store.Posts().Count(bson.D{{Key: "deleted", Value: false}, {Key: "category_id", Value: category.ID}})
+		numOfPosts, err := s.store.Posts().Count(bson.D{
+			{Key: "deleted", Value: false},
+			{Key: "category_id", Value: category.ID},
+		})
 		if err != nil {
 			s.logger.Logf("[DEBUG] page: %v\n", err)
 			http.Redirect(w, r, "/404", http.StatusSeeOther)
@@ -289,13 +302,25 @@ func (s *Server) handleSingleCategoryPage() http.HandlerFunc {
 
 		// Find posts with joining information from categories colleciton
 		posts, err := s.store.Posts().Aggregate(mongo.Pipeline{
-			bson.D{{"$lookup", bson.D{{"from", "categories"}, {"localField", "category_id"}, {"foreignField", "_id"}, {"as", "category_slug"}}}},
-			bson.D{{"$match", bson.D{{"deleted", false}, {"category_id", category.ID}}}},
-			bson.D{{"$project", bson.D{{"title", 1}, {"snippet", 1}, {"postimg", 1}, {"time", 1}, {"slug", 1}, {"category_slug", "$category_slug.slug"}}}},
-			bson.D{{"$sort", bson.D{{"time", -1}}}},
-			bson.D{{"$skip", numOfSkip}},
-			bson.D{{"$limit", postPerPage}},
-			bson.D{{"$unwind", "$category_slug"}}})
+			{{"$lookup", bson.D{
+				{"from", "categories"},
+				{"localField", "category_id"},
+				{"foreignField", "_id"},
+				{"as", "category_slug"}}}},
+			{{"$match", bson.D{
+				{"deleted", false},
+				{"category_id", category.ID}}}},
+			{{"$project", bson.D{
+				{"title", 1},
+				{"snippet", 1},
+				{"postimg", 1},
+				{"time", 1},
+				{"slug", 1},
+				{"category_slug", "$category_slug.slug"}}}},
+			{{"$sort", bson.D{{"time", -1}}}},
+			{{"$skip", numOfSkip}},
+			{{"$limit", postPerPage}},
+			{{"$unwind", "$category_slug"}}})
 		if err != nil {
 			s.logger.Logf("[DEBUG] %v\n", err)
 			http.Redirect(w, r, "/404", http.StatusSeeOther)
@@ -352,57 +377,51 @@ func (s *Server) handleMaterialsPage() http.HandlerFunc {
 		}
 
 		mats, err := s.store.MatCategories().Aggregate(mongo.Pipeline{
-			{
-				{
-					Key: "$lookup", Value: bson.D{
-						{Key: "from", Value: "materials"},
-						{Key: "let", Value: bson.D{
-							{Key: "matcat_id", Value: "$_id"},
-						}},
-						{Key: "pipeline", Value: bson.A{
-							bson.D{
-								{Key: "$match", Value: bson.D{
-									{Key: "deleted", Value: false},
+			{{
+				Key: "$lookup", Value: bson.D{
+					{Key: "from", Value: "materials"},
+					{Key: "let", Value: bson.D{
+						{Key: "matcat_id", Value: "$_id"},
+					}},
+					{Key: "pipeline", Value: bson.A{
+						bson.D{
+							{Key: "$match", Value: bson.D{
+								{Key: "deleted", Value: false},
+							}},
+						},
+						bson.D{
+							{Key: "$sort", Value: bson.D{
+								{Key: "time", Value: -1},
+							}},
+						},
+						bson.D{
+							{Key: "$match", Value: bson.D{
+								{Key: "$expr", Value: bson.D{
+									{Key: "$eq", Value: bson.A{"$matcategory_id", "$$matcat_id"}},
 								}},
-							},
-							bson.D{
-								{Key: "$sort", Value: bson.D{
-									{Key: "time", Value: -1},
-								}},
-							},
-							bson.D{
-								{Key: "$match", Value: bson.D{
-									{Key: "$expr", Value: bson.D{
-										{Key: "$eq", Value: bson.A{"$matcategory_id", "$$matcat_id"}},
-									}},
-								}},
-							}, bson.D{
-								{Key: "$limit", Value: 3},
-							},
-						}},
-						{Key: "as", Value: "materials"},
-					},
+							}},
+						}, bson.D{
+							{Key: "$limit", Value: 3},
+						},
+					}},
+					{Key: "as", Value: "materials"},
+				},
+			}},
+			{{
+				Key: "$match", Value: bson.D{
+					{Key: "deleted", Value: false},
+				},
+			}},
+			{{
+				Key: "$project", Value: bson.D{
+					{Key: "_id", Value: 1},
+					{Key: "title", Value: 1},
+					{Key: "slug", Value: 1},
+					{Key: "desc", Value: 1},
+					{Key: "materials", Value: 1},
 				},
 			},
-			{
-				{
-					Key: "$match", Value: bson.D{
-						{Key: "deleted", Value: false},
-					},
-				},
-			},
-			{
-				{
-					Key: "$project", Value: bson.D{
-						{Key: "_id", Value: 1},
-						{Key: "title", Value: 1},
-						{Key: "slug", Value: 1},
-						{Key: "desc", Value: 1},
-						{Key: "materials", Value: 1},
-					},
-				},
-			},
-		})
+			}})
 		if err != nil {
 			s.logger.Logf("[DEBUG] %v\n", err)
 			http.Redirect(w, r, "/404", http.StatusSeeOther)
