@@ -6,8 +6,9 @@ services:
     volumes:
       - ./static:/app/static
       - ./uploads:/app/uploads
+      - ./admin:/app/admin
       - ./etc/acg.conf:/etc/nginx/conf.d/acg.conf
-      - ./etc/acg-admin.conf:/etc/nginx/conf.d/acg-admin.conf
+      # - ./etc/acg-admin.conf:/etc/nginx/conf.d/acg-admin.conf
       - ./etc/nginx.conf:/etc/nginx/nginx.conf
     ports:
       - "80:80"
