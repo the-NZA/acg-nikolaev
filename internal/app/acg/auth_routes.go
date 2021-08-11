@@ -43,7 +43,7 @@ func (s *Server) handleAuthLogin() http.HandlerFunc {
 		token, expTime, err := s.store.Users().Login(cred.Username, cred.Password, s.config.SecretKey)
 		if err != nil {
 			s.logger.Logf("[ERROR] %v\n", err)
-			s.error(w, r, http.StatusInternalServerError, err)
+			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
 
