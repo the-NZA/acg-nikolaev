@@ -59,7 +59,7 @@ func (s *Server) handleAuthLogin() http.HandlerFunc {
 		s.respond(w, r, http.StatusOK, map[string]string{
 			"login": "successful",
 			// "user":  cred.Username,
-			// "token": token,
+			"token": token,
 		})
 	}
 }

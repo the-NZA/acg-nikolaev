@@ -90,7 +90,10 @@ func (s *Server) configureRouter() {
 
 	// API Routes
 	s.router.Route("/api", func(r chi.Router) {
-		r.Use(s.authMiddleware)
+		// ! REMOVE BEFORE GOING ONLIVE
+		if !s.config.LogDebug {
+			r.Use(s.authMiddleware)
+		}
 
 		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 			s.respond(w, r, http.StatusOK, "This is API endpoint")
