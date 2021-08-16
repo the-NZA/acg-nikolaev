@@ -99,6 +99,8 @@ func (s *Server) configureRouter() {
 			s.respond(w, r, http.StatusOK, "This is API endpoint")
 		})
 
+		// r.Post("/upload", s.handleUpload())
+
 		r.Route("/category", func(r chi.Router) {
 			r.Get("/", s.handleCategoryGetBySlug())
 			r.Post("/", s.handleCategoryCreate())
@@ -136,7 +138,8 @@ func (s *Server) configureRouter() {
 		})
 
 		r.Route("/page", func(r chi.Router) {
-			r.Get("/", s.handlePageGetByURL())
+			// r.Get("/", s.handlePageGetByURL())
+			r.Get("/", s.handlePageGetByID())
 			r.Post("/", s.handlePageCreate())
 			r.Delete("/", s.handlePageDelete())
 			r.Put("/", s.handlePageUpdate())

@@ -72,6 +72,7 @@ type IServiceRepository interface {
 type IPageRepository interface {
 	Create(*models.Page) error
 	FindByURL(string) (*models.Page, error)
+	FindByID(primitive.ObjectID) (*models.Page, error)
 	Update(*models.Page) error
 	Delete(primitive.ObjectID) error
 	FindAll(filter bson.M) ([]*models.Page, error)

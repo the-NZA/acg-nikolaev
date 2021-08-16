@@ -66,9 +66,14 @@ func (p PageRepository) FindBySlug(slug string) (*models.Page, error) {
 	return p.findOne(bson.M{"slug": slug})
 }
 
-// FindByURL return all pages by it URL
+// FindByURL return page by it URL
 func (p PageRepository) FindByURL(URL string) (*models.Page, error) {
 	return p.findOne(bson.M{"url": URL})
+}
+
+// FindByID return page by it ID
+func (p PageRepository) FindByID(ID primitive.ObjectID) (*models.Page, error) {
+	return p.findOne(bson.M{"_id": ID})
 }
 
 // FindAll return all pages with specified filter
