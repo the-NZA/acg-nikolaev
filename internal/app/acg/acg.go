@@ -90,7 +90,7 @@ func (s *Server) configureRouter() {
 
 	// API Routes
 	s.router.Route("/api", func(r chi.Router) {
-		// ! REMOVE BEFORE GOING ONLIVE
+		// ! REMOVE BEFORE GOING LIVE
 		if !s.config.LogDebug {
 			r.Use(s.authMiddleware)
 		}

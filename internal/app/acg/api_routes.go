@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 
@@ -52,8 +53,16 @@ func (s *Server) handleUpload() http.HandlerFunc {
 		}
 		defer uFile.Close()
 
+		// Match MIME types
+		isImage, _ := regexp.MatchString(`image\/(jpg|png|jpeg|webp|gif|svg\+xml)`, uHeader.Header["Content-Type"][0])
+		subFolder := "documents/"
+		if isImage {
+			subFolder = "images/"
+		}
+
+		// Generate filename with specific format
 		suf := time.Now().Format("02-01-2006_15-04-05")
-		uploadPath := "uploads/" + suf + "_" + strings.ReplaceAll(uHeader.Filename, " ", "_")
+		uploadPath := "uploads/" + subFolder + suf + "_" + strings.ReplaceAll(uHeader.Filename, " ", "_")
 
 		f, err := os.OpenFile(uploadPath, os.O_WRONLY|os.O_CREATE, 0666)
 		if err != nil {
@@ -63,6 +72,7 @@ func (s *Server) handleUpload() http.HandlerFunc {
 		}
 		defer f.Close()
 
+		// Copy file bytes into file
 		bytesWritten, err := io.Copy(f, uFile)
 		if err != nil {
 			s.logger.Logf("[ERROR] during new file creation %v\n", err)
