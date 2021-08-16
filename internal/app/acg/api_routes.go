@@ -3,7 +3,10 @@ package acg
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -14,10 +17,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+const maxFileSize = 32 << 20 // Set max upload file size to 32MB
+
 /*
  * Response helpers
  */
-
 // respond method manage response with json encoding and optional data
 func (s Server) respond(w http.ResponseWriter, r *http.Request, code int, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
@@ -31,6 +35,45 @@ func (s Server) respond(w http.ResponseWriter, r *http.Request, code int, data i
 // error method manage response with error with wrapping it
 func (s Server) error(w http.ResponseWriter, r *http.Request, code int, err error) {
 	s.respond(w, r, code, map[string]string{"error": err.Error()})
+}
+
+/*
+ * Upload handler
+ */
+func (s *Server) handleUpload() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		r.ParseMultipartForm(maxFileSize)
+
+		uFile, uHeader, err := r.FormFile("acg_upload")
+		if err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+		defer uFile.Close()
+
+		suf := time.Now().Format("02-01-2006_15-04-05")
+		uploadPath := "uploads/" + suf + "_" + strings.ReplaceAll(uHeader.Filename, " ", "_")
+
+		f, err := os.OpenFile(uploadPath, os.O_WRONLY|os.O_CREATE, 0666)
+		if err != nil {
+			s.logger.Logf("[ERROR] during new file creation %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+		defer f.Close()
+
+		bytesWritten, err := io.Copy(f, uFile)
+		if err != nil {
+			s.logger.Logf("[ERROR] during new file creation %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		s.logger.Logf("[DEBUG] File %s uploaded in %s. Size %v\n", uHeader.Filename, f.Name(), bytesWritten)
+
+		s.respond(w, r, http.StatusOK, uploadPath)
+	}
 }
 
 /*

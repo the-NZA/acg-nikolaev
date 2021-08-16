@@ -99,7 +99,7 @@ func (s *Server) configureRouter() {
 			s.respond(w, r, http.StatusOK, "This is API endpoint")
 		})
 
-		// r.Post("/upload", s.handleUpload())
+		r.Post("/upload", s.handleUpload())
 
 		r.Route("/category", func(r chi.Router) {
 			r.Get("/", s.handleCategoryGetBySlug())
