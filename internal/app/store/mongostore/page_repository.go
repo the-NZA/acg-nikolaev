@@ -114,9 +114,10 @@ func (p PageRepository) updateOne(filter bson.M, update bson.M, opts ...*options
 	return nil
 }
 
+// Update validate update page model and try to update it in db
 func (p PageRepository) Update(updatedPage *models.Page) error {
 	if err := updatedPage.Validate(); err != nil {
-		return nil
+		return err
 	}
 
 	return p.updateOne(bson.M{"_id": updatedPage.ID}, bson.M{"$set": updatedPage})
