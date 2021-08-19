@@ -62,6 +62,7 @@ type IUserRepository interface {
 // IServiceRepository defines interface for service repository
 type IServiceRepository interface {
 	Create(*models.Service) error
+	Update(*models.Service) error
 	FindByID(primitive.ObjectID) (*models.Service, error)
 	FindBySlug(string) (*models.Service, error)
 	Delete(primitive.ObjectID) error

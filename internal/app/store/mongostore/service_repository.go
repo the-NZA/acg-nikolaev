@@ -109,6 +109,15 @@ func (s ServiceRepository) updateOne(filter bson.M, update bson.M, opts ...*opti
 	return nil
 }
 
+// Update validate updated service and try to update it in db
+func (s ServiceRepository) Update(updatedService *models.Service) error {
+	if err := updatedService.Validate(); err != nil {
+		return err
+	}
+
+	return s.updateOne(bson.M{"_id": updatedService.ID}, bson.M{"$set": updatedService})
+}
+
 // Delete marks service as deleted
 func (s ServiceRepository) Delete(deletedID primitive.ObjectID) error {
 	return s.updateOne(bson.M{"_id": deletedID}, bson.M{"$set": bson.M{"deleted": true}})
