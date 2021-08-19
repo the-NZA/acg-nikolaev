@@ -395,6 +395,27 @@ func (s *Server) handleServiceGetByID() http.HandlerFunc {
 	}
 }
 
+func (s *Server) handleServiceUpdate() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var err error
+		service := &models.Service{}
+
+		if err = json.NewDecoder(r.Body).Decode(service); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		if err = s.store.Services().Update(service); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, fmt.Sprintf("Service (%v) successfully updated", service.ID.Hex()))
+	}
+}
+
 func (s *Server) handleServiceDelete() http.HandlerFunc {
 	type req struct {
 		ID primitive.ObjectID `json:"deletedID"`
