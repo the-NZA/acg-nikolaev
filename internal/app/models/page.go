@@ -23,7 +23,7 @@ func (p Page) Validate() error {
 		validation.Field(&p.Title, validation.Required, validation.RuneLength(5, 55)),
 		validation.Field(&p.Subtitle, validation.Required, validation.RuneLength(30, 255)),
 		validation.Field(&p.MetaDesc, validation.Required, validation.RuneLength(50, 255)),
-		validation.Field(&p.URL, validation.Required, validation.RuneLength(5, 255)),
+		validation.Field(&p.URL, validation.Required, validation.When(p.URL != "/", validation.RuneLength(5, 255)).Else(validation.Skip)),
 		validation.Field(&p.PageData, validation.NilOrNotEmpty),
 	)
 }
