@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -16,6 +17,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const maxFileSize = 32 << 20 // Set max upload file size to 32MB
@@ -316,7 +318,36 @@ func (s *Server) handlePostDelete() http.HandlerFunc {
 
 func (s *Server) handlePostGetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		posts, err := s.store.Posts().FindAll(bson.M{"deleted": false})
+		var err error
+		var val int64
+		findOpts := options.Find()
+		findOpts.SetSort(bson.D{{Key: "time", Value: -1}})
+
+		if r.URL.Query().Has("limit") {
+			limitStr := r.URL.Query().Get("limit")
+			val, err = strconv.ParseInt(limitStr, 10, 64)
+			if err != nil {
+				s.logger.Logf("[DEBUG] during parse limit: %v\n", err)
+				s.error(w, r, http.StatusBadRequest, err)
+				return
+			}
+
+			findOpts.SetLimit(val)
+		}
+
+		if r.URL.Query().Has("skip") {
+			limitStr := r.URL.Query().Get("skip")
+			val, err = strconv.ParseInt(limitStr, 10, 64)
+			if err != nil {
+				s.logger.Logf("[DEBUG] during parse skip: %v\n", err)
+				s.error(w, r, http.StatusBadRequest, err)
+				return
+			}
+
+			findOpts.SetSkip(val)
+		}
+
+		posts, err := s.store.Posts().Find(bson.M{"deleted": false}, findOpts)
 		if err != nil {
 			s.logger.Logf("[ERROR] %v\n", err)
 			s.error(w, r, http.StatusInternalServerError, err)
