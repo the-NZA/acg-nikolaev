@@ -320,6 +320,7 @@ func (s *Server) handlePostGetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var err error
 		var val int64
+
 		findOpts := options.Find()
 		findOpts.SetSort(bson.D{{Key: "time", Value: -1}})
 
@@ -355,6 +356,19 @@ func (s *Server) handlePostGetAll() http.HandlerFunc {
 		}
 
 		s.respond(w, r, http.StatusOK, posts)
+	}
+}
+
+func (s *Server) handleCountPages() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		numOfPosts, err := s.store.Posts().Count(bson.D{{Key: "deleted", Value: false}})
+		if err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, map[string]int64{"count": numOfPosts})
 	}
 }
 
