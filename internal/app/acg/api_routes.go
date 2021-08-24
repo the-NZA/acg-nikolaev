@@ -146,6 +146,41 @@ func (s *Server) handleCategoryGetBySlug() http.HandlerFunc {
 	}
 }
 
+func (s *Server) handleCategoryGetByID() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ID := r.URL.Query().Get("ID")
+
+		if ID == "" {
+			s.logger.Logf("[ERROR] %v\n", helpers.ErrNoRequestParams)
+			s.error(w, r, http.StatusBadRequest, helpers.ErrNoRequestParams)
+			return
+		}
+
+		objID, err := primitive.ObjectIDFromHex(ID)
+		if err != nil {
+			s.logger.Logf("[ERROR] %v\n", helpers.ErrInvalidObjectID)
+			s.error(w, r, http.StatusBadRequest, helpers.ErrInvalidObjectID)
+			return
+		}
+
+		category, err := s.store.Categories().FindByID(objID)
+
+		switch err {
+		case mongo.ErrNoDocuments:
+			s.logger.Logf("[ERROR] %v\n", helpers.ErrNoCategory)
+			s.error(w, r, http.StatusNotFound, helpers.ErrNoCategory)
+			return
+		case nil:
+			s.respond(w, r, http.StatusOK, category)
+			return
+		default:
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+	}
+}
+
 func (s *Server) handleCategoryGetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cats, err := s.store.Categories().FindAll(bson.M{"deleted": false})
