@@ -107,3 +107,27 @@ func (c *CategoryRepository) Delete(deletedID primitive.ObjectID) error {
 
 	return nil
 }
+
+func (c *CategoryRepository) updateOne(filter bson.M, update bson.M, opts ...*options.UpdateOptions) error {
+	var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	db := c.store.db.Database(dbName)
+	col := db.Collection(c.collectionName)
+
+	_, err := col.UpdateOne(ctx, filter, update, opts...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Update validate category and try to save it
+func (c *CategoryRepository) Update(updatedCategory *models.Category) error {
+	if err := updatedCategory.Validate(); err != nil {
+		return err
+	}
+
+	return c.updateOne(bson.M{"_id": updatedCategory.ID}, bson.M{"$set": updatedCategory})
+}

@@ -118,6 +118,27 @@ func (s *Server) handleCategoryCreate() http.HandlerFunc {
 	}
 }
 
+func (s *Server) handleCategoryUpdate() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var err error
+		category := &models.Category{}
+
+		if err = json.NewDecoder(r.Body).Decode(category); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		if err = s.store.Categories().Update(category); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, fmt.Sprintf("Category (%v) successfully updated", category.ID.Hex()))
+	}
+}
+
 func (s *Server) handleCategoryGetBySlug() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		slug := r.URL.Query().Get("slug")

@@ -29,6 +29,7 @@ type ICategoryRepository interface {
 	FindByID(primitive.ObjectID) (*models.Category, error)
 	FindBySlug(string) (*models.Category, error)
 	FindAll(bson.M) ([]*models.Category, error)
+	Update(*models.Category) error
 	Delete(primitive.ObjectID) error
 }
 
