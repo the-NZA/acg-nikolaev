@@ -15,7 +15,7 @@ type IPostRepository interface {
 	Create(*models.Post) error
 	Find(bson.M, ...*options.FindOptions) ([]*models.Post, error)
 	FindBySlug(string) (*models.Post, error)
-	FindByURL(string) (*models.Post, error)
+	FindByID(primitive.ObjectID) (*models.Post, error)
 	FindAll(bson.M) ([]*models.Post, error)
 	Aggregate(mongo.Pipeline, ...*options.AggregateOptions) ([]*models.Post, error)
 	Count(interface{}, ...*options.CountOptions) (int64, error)

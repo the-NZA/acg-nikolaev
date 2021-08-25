@@ -67,10 +67,9 @@ func (p PostRepository) FindBySlug(slug string) (*models.Post, error) {
 	return p.findOne(bson.M{"slug": slug, "deleted": false})
 }
 
-// FindByURL return all posts by it URL
-// ! DEPRECATED because of no url field
-func (p PostRepository) FindByURL(URL string) (*models.Post, error) {
-	return p.findOne(bson.M{"url": URL, "deleted": false})
+// FindByID lookup post by it ID
+func (p PostRepository) FindByID(ID primitive.ObjectID) (*models.Post, error) {
+	return p.findOne(bson.M{"_id": ID, "deleted": false})
 }
 
 // FindAll return all posts with specified filter

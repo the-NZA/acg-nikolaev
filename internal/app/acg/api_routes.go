@@ -320,6 +320,50 @@ func (s *Server) handlePostGetBySlug() http.HandlerFunc {
 	}
 }
 
+func (s *Server) handlePostGetByID() http.HandlerFunc {
+	type response struct {
+		*models.Post
+		CategoryName string `json:"category_name"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		ID := r.URL.Query().Get("ID")
+
+		if ID == "" {
+			s.logger.Logf("[ERROR] %v\n", helpers.ErrNoRequestParams)
+			s.error(w, r, http.StatusBadRequest, helpers.ErrNoRequestParams)
+			return
+		}
+
+		objID, err := primitive.ObjectIDFromHex(ID)
+		if err != nil {
+			s.logger.Logf("[ERROR] %v\n", helpers.ErrInvalidObjectID)
+			s.error(w, r, http.StatusBadRequest, helpers.ErrInvalidObjectID)
+			return
+		}
+
+		post, err := s.store.Posts().FindByID(objID)
+		category, err := s.store.Categories().FindByID(post.CategoryID)
+
+		switch err {
+		case mongo.ErrNoDocuments:
+			s.logger.Logf("[ERROR] %v\n", helpers.ErrNoPost)
+			s.error(w, r, http.StatusNotFound, helpers.ErrNoPost)
+			return
+		case nil:
+			s.respond(w, r, http.StatusOK, response{
+				Post:         post,
+				CategoryName: category.Title,
+			})
+			return
+		default:
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+	}
+}
+
 // handlePostUpdate update post by it id
 // * NOTE: must receive whole post struct
 func (s *Server) handlePostUpdate() http.HandlerFunc {

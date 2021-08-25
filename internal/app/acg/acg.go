@@ -110,7 +110,7 @@ func (s *Server) configureRouter() {
 		})
 
 		r.Route("/post", func(r chi.Router) {
-			r.Get("/", s.handlePostGetBySlug())
+			r.Get("/", s.handlePostGetByID())
 			r.Post("/", s.handlePostCreate())
 			r.Delete("/", s.handlePostDelete())
 			r.Put("/", s.handlePostUpdate())
