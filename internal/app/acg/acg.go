@@ -128,7 +128,7 @@ func (s *Server) configureRouter() {
 
 		r.Route("/matcategory", func(r chi.Router) {
 			r.Post("/", s.handleMatCategoryCreate())
-			r.Get("/", s.handleMatCategoryGetBySlug())
+			r.Get("/", s.handleMatCategoryGetByID())
 			r.Delete("/", s.handleMatCategoryDelete())
 			r.Get("/all", s.handleMatCategoryGetAll())
 		})
