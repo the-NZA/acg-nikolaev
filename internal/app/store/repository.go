@@ -49,6 +49,7 @@ type IMatCategoryRepository interface {
 	FindBySlug(string) (*models.MatCategory, error)
 	FindAll(bson.M) ([]*models.MatCategory, error)
 	Aggregate(mongo.Pipeline, ...*options.AggregateOptions) ([]*models.MaterialShow, error)
+	Update(*models.MatCategory) error
 	Delete(primitive.ObjectID) error
 }
 

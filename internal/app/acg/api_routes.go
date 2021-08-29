@@ -702,6 +702,26 @@ func (s *Server) handleMatCategoryGetBySlug() http.HandlerFunc {
 	}
 }
 
+func (s *Server) handleMatCategoryUpdate() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var err error
+		matcategory := &models.MatCategory{}
+
+		if err = json.NewDecoder(r.Body).Decode(matcategory); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		if err = s.store.MatCategories().Update(matcategory); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, fmt.Sprintf("MatCategory (%v) successfully updated", matcategory.ID.Hex()))
+	}
+}
 func (s *Server) handleMatCategoryDelete() http.HandlerFunc {
 	type req struct {
 		ID primitive.ObjectID `json:"deletedID"`

@@ -131,6 +131,15 @@ func (m MatCatRepository) updateOne(filter bson.M, update bson.M, opts ...*optio
 	return nil
 }
 
+// Update validate matcategory and try to save it
+func (m MatCatRepository) Update(updatedMatCategory *models.MatCategory) error {
+	if err := updatedMatCategory.Validate(); err != nil {
+		return err
+	}
+
+	return m.updateOne(bson.M{"_id": updatedMatCategory.ID}, bson.M{"$set": updatedMatCategory})
+}
+
 // Delete marks material category as deleted
 func (m MatCatRepository) Delete(deletedID primitive.ObjectID) error {
 	return m.updateOne(bson.M{"_id": deletedID}, bson.M{"$set": bson.M{"deleted": true}})

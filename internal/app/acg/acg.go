@@ -130,6 +130,7 @@ func (s *Server) configureRouter() {
 			r.Post("/", s.handleMatCategoryCreate())
 			r.Get("/", s.handleMatCategoryGetByID())
 			r.Delete("/", s.handleMatCategoryDelete())
+			r.Put("/", s.handleMatCategoryUpdate())
 			r.Get("/all", s.handleMatCategoryGetAll())
 		})
 
