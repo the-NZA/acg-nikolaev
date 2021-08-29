@@ -321,11 +321,6 @@ func (s *Server) handlePostGetBySlug() http.HandlerFunc {
 }
 
 func (s *Server) handlePostGetByID() http.HandlerFunc {
-	type response struct {
-		*models.Post
-		CategoryName string `json:"category_name"`
-	}
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		ID := r.URL.Query().Get("ID")
 
@@ -343,7 +338,6 @@ func (s *Server) handlePostGetByID() http.HandlerFunc {
 		}
 
 		post, err := s.store.Posts().FindByID(objID)
-		category, err := s.store.Categories().FindByID(post.CategoryID)
 
 		switch err {
 		case mongo.ErrNoDocuments:
@@ -351,10 +345,7 @@ func (s *Server) handlePostGetByID() http.HandlerFunc {
 			s.error(w, r, http.StatusNotFound, helpers.ErrNoPost)
 			return
 		case nil:
-			s.respond(w, r, http.StatusOK, response{
-				Post:         post,
-				CategoryName: category.Title,
-			})
+			s.respond(w, r, http.StatusOK, post)
 			return
 		default:
 			s.logger.Logf("[ERROR] %v\n", err)
@@ -809,7 +800,7 @@ func (s *Server) handleMaterialCreate() http.HandlerFunc {
 			return
 		}
 
-		s.respond(w, r, http.StatusCreated, fmt.Sprintf("Material (%s) successfully created", material.ID.Hex()))
+		s.respond(w, r, http.StatusCreated, material.ID.Hex())
 	}
 }
 
