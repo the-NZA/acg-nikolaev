@@ -409,15 +409,18 @@ func (s *Server) handlePostDelete() http.HandlerFunc {
 
 func (s *Server) handlePostGetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var err error
-		var val int64
+		var (
+			err    error
+			val    int64
+			strVal string
+		)
 
 		findOpts := options.Find()
 		findOpts.SetSort(bson.D{{Key: "time", Value: -1}})
 
 		if r.URL.Query().Has("limit") {
-			limitStr := r.URL.Query().Get("limit")
-			val, err = strconv.ParseInt(limitStr, 10, 64)
+			strVal = r.URL.Query().Get("limit")
+			val, err = strconv.ParseInt(strVal, 10, 64)
 			if err != nil {
 				s.logger.Logf("[DEBUG] during parse limit: %v\n", err)
 				s.error(w, r, http.StatusBadRequest, err)
@@ -428,8 +431,8 @@ func (s *Server) handlePostGetAll() http.HandlerFunc {
 		}
 
 		if r.URL.Query().Has("skip") {
-			limitStr := r.URL.Query().Get("skip")
-			val, err = strconv.ParseInt(limitStr, 10, 64)
+			strVal = r.URL.Query().Get("skip")
+			val, err = strconv.ParseInt(strVal, 10, 64)
 			if err != nil {
 				s.logger.Logf("[DEBUG] during parse skip: %v\n", err)
 				s.error(w, r, http.StatusBadRequest, err)
@@ -450,7 +453,7 @@ func (s *Server) handlePostGetAll() http.HandlerFunc {
 	}
 }
 
-func (s *Server) handleCountPages() http.HandlerFunc {
+func (s *Server) handlePostCount() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		numOfPosts, err := s.store.Posts().Count(bson.D{{Key: "deleted", Value: false}})
 		if err != nil {
@@ -872,7 +875,40 @@ func (s *Server) handleMaterialDelete() http.HandlerFunc {
 
 func (s *Server) handleMaterialGetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		materials, err := s.store.Materials().FindAll(bson.M{"deleted": false})
+		var (
+			err    error
+			val    int64
+			strVal string
+		)
+
+		findOpts := options.Find()
+		findOpts.SetSort(bson.D{{Key: "time", Value: -1}})
+
+		if r.URL.Query().Has("limit") {
+			strVal = r.URL.Query().Get("limit")
+			val, err = strconv.ParseInt(strVal, 10, 64)
+			if err != nil {
+				s.logger.Logf("[DEBUG] during parse limit: %v\n", err)
+				s.error(w, r, http.StatusBadRequest, err)
+				return
+			}
+
+			findOpts.SetLimit(val)
+		}
+
+		if r.URL.Query().Has("skip") {
+			strVal = r.URL.Query().Get("skip")
+			val, err = strconv.ParseInt(strVal, 10, 64)
+			if err != nil {
+				s.logger.Logf("[DEBUG] during parse skip: %v\n", err)
+				s.error(w, r, http.StatusBadRequest, err)
+				return
+			}
+
+			findOpts.SetSkip(val)
+		}
+
+		materials, err := s.store.Materials().Find(bson.M{"deleted": false}, findOpts)
 		if err != nil {
 			s.logger.Logf("[ERROR] %v\n", err)
 			s.error(w, r, http.StatusInternalServerError, err)
@@ -908,6 +944,19 @@ func (s *Server) handleMaterialGetAllBySlug() http.HandlerFunc {
 			MatCategory: matcat,
 			Materials:   materials,
 		})
+	}
+}
+
+func (s *Server) handleMaterialCount() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		numOfMaterials, err := s.store.Materials().Count(bson.D{{Key: "deleted", Value: false}})
+		if err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, map[string]int64{"count": numOfMaterials})
 	}
 }
 

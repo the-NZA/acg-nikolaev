@@ -115,7 +115,7 @@ func (s *Server) configureRouter() {
 			r.Delete("/", s.handlePostDelete())
 			r.Put("/", s.handlePostUpdate())
 			r.Get("/all", s.handlePostGetAll())
-			r.Get("/count", s.handleCountPages())
+			r.Get("/count", s.handlePostCount())
 		})
 
 		r.Route("/service", func(r chi.Router) {
@@ -139,6 +139,7 @@ func (s *Server) configureRouter() {
 			r.Get("/", s.handleMaterialGetByID())
 			r.Delete("/", s.handleMaterialDelete())
 			r.Get("/all", s.handleMaterialGetAll())
+			r.Get("/count", s.handleMaterialCount())
 		})
 
 		r.Route("/page", func(r chi.Router) {

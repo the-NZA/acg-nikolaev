@@ -142,6 +142,7 @@ func (p PostRepository) Aggregate(pipeline mongo.Pipeline, opts ...*options.Aggr
 	return posts, nil
 }
 
+// Count return number of posts that match filter with opts
 func (p PostRepository) Count(filter interface{}, opts ...*options.CountOptions) (int64, error) {
 	var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
