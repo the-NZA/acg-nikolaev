@@ -377,6 +377,7 @@ func (s *Server) handlePostUpdate() http.HandlerFunc {
 		s.respond(w, r, http.StatusOK, fmt.Sprintf("Post (%v) successfully updated", post.ID.Hex()))
 	}
 }
+
 func (s *Server) handlePostDelete() http.HandlerFunc {
 	type req struct {
 		ID primitive.ObjectID `json:"deletedID"`
@@ -842,6 +843,28 @@ func (s *Server) handleMaterialGetByID() http.HandlerFunc {
 	}
 }
 
+// handleMaterialUpdate update post by it id
+// * NOTE: must receive whole material struct
+func (s *Server) handleMaterialUpdate() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var err error
+		material := &models.Material{}
+
+		if err = json.NewDecoder(r.Body).Decode(material); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		if err = s.store.Materials().Update(material); err != nil {
+			s.logger.Logf("[ERROR] %v\n", err)
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, fmt.Sprintf("Post (%v) successfully updated", material.ID.Hex()))
+	}
+}
 func (s *Server) handleMaterialDelete() http.HandlerFunc {
 	type req struct {
 		ID primitive.ObjectID `json:"deletedID"`

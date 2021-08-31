@@ -138,6 +138,7 @@ func (s *Server) configureRouter() {
 			r.Post("/", s.handleMaterialCreate())
 			r.Get("/", s.handleMaterialGetByID())
 			r.Delete("/", s.handleMaterialDelete())
+			r.Put("/", s.handleMaterialUpdate())
 			r.Get("/all", s.handleMaterialGetAll())
 			r.Get("/count", s.handleMaterialCount())
 		})

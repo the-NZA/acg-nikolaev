@@ -168,6 +168,7 @@ func (p PostRepository) updateOne(filter bson.M, update bson.M, opts ...*options
 	return nil
 }
 
+// Update recieve post, validate it and try to update it
 func (p PostRepository) Update(updatedPost *models.Post) error {
 	if err := updatedPost.Validate(); err != nil {
 		return err

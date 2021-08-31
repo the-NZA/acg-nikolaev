@@ -40,6 +40,7 @@ type IMaterialRepository interface {
 	FindByID(primitive.ObjectID) (*models.Material, error)
 	FindBySlug(string) (*models.Material, error)
 	FindAll(bson.M) ([]*models.Material, error)
+	Update(*models.Material) error
 	Count(interface{}, ...*options.CountOptions) (int64, error)
 	Delete(primitive.ObjectID) error
 }

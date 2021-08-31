@@ -131,6 +131,15 @@ func (m MaterialRepository) updateOne(filter bson.M, update bson.M, opts ...*opt
 	return nil
 }
 
+// Update recieve material, validate it and try to update it
+func (m MaterialRepository) Update(updatedMaterial *models.Material) error {
+	if err := updatedMaterial.Validate(); err != nil {
+		return err
+	}
+
+	return m.updateOne(bson.M{"_id": updatedMaterial.ID}, bson.M{"$set": updatedMaterial})
+}
+
 // Delete marks post as deleted
 func (m MaterialRepository) Delete(deletedID primitive.ObjectID) error {
 	return m.updateOne(bson.M{"_id": deletedID}, bson.M{"$set": bson.M{"deleted": true}})
